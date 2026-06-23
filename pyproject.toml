@@ -1,0 +1,44 @@
+[project]
+name = "halcyon-underwriting-copilot"
+version = "0.1.0"
+description = "Agentic Underwriting Copilot — auditable, explainable, fair lending decisions via cooperating AI agents."
+readme = "README.md"
+requires-python = ">=3.11"
+license = { file = "LICENSE" }
+authors = [
+    { name = "Team Jamun — Harshit, Ayush, Aditya, Himkar" },
+]
+keywords = ["agentic-ai", "langgraph", "credit-underwriting", "rag", "evaluation", "responsible-ai"]
+
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+# ──────────────────────────── Ruff (lint + format) ────────────────────────────
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+extend-exclude = ["data/raw", "chroma", ".venv"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "C4", "SIM", "PD"]
+ignore = ["E501"]  # line length handled by formatter
+
+[tool.ruff.lint.isort]
+known-first-party = ["agents", "tools", "gateway", "api", "state", "eval"]
+
+# ──────────────────────────── mypy (types) ────────────────────────────
+[tool.mypy]
+python_version = "3.11"
+warn_unused_ignores = true
+warn_redundant_casts = true
+disallow_untyped_defs = true
+ignore_missing_imports = true
+plugins = ["pydantic.mypy"]
+
+# ──────────────────────────── pytest ────────────────────────────
+[tool.pytest.ini_options]
+minversion = "8.0"
+addopts = "-ra -q"
+testpaths = ["tests"]
+asyncio_mode = "auto"
