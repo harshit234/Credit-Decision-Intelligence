@@ -1,0 +1,31 @@
+# CODEOWNERS — automatic review requests by area.
+# Maps each part of the system to the team member who owns and defends it (viva gate).
+# NOTE: confirm GitHub handles for Ayush and Aditya, then replace the @TODO placeholders.
+#   Known handles: @harshit234  @Himkar001
+
+# ---- Default: both maintainers review anything not matched below ----
+*                       @harshit234 @Himkar001
+
+# ---- Risk model + data + EDA  →  Harshit ----
+/data/                  @harshit234
+/agents/risk_agent.py   @harshit234
+
+# ---- Orchestrator + persistence + API  →  Aditya (@TODO-aditya-handle) ----
+/agents/orchestrator.py @harshit234
+/api/                   @harshit234
+/state/                 @harshit234
+
+# ---- Policy RAG + faithfulness evaluation  →  Ayush (@TODO-ayush-handle) ----
+/agents/policy_agent.py @harshit234
+/tools/policy_retrieval_tool.py  @harshit234
+/eval/                  @harshit234
+
+# ---- LLM gateway + synthesizer + DSPy  →  Himkar ----
+/gateway/               @Himkar001
+/agents/synthesizer_agent.py     @Himkar001
+/agents/evaluation_agent.py      @Himkar001
+
+# ---- Governance docs: both maintainers ----
+/CLAUDE.md              @harshit234 @Himkar001
+/PROGRESS.md            @harshit234 @Himkar001
+/DECISIONS.md           @harshit234 @Himkar001
