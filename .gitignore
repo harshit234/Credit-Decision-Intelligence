@@ -1,0 +1,63 @@
+# ---- Secrets & environment ----
+.env
+.env.*
+!.env.example
+*.key
+*.pem
+secrets/
+
+# ---- Python ----
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+build/
+dist/
+.venv/
+venv/
+env/
+.python-version
+
+# ---- Testing & coverage ----
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+coverage.xml
+htmlcov/
+
+# ---- Notebooks ----
+.ipynb_checkpoints/
+
+# ---- Data & models (do NOT commit raw data or large artifacts) ----
+data/raw/
+data/interim/
+data/processed/
+*.parquet
+*.csv
+!data/**/sample_*.csv
+*.pkl
+*.joblib
+models/*.bin
+models/*.ubj
+
+# ---- Vector store / DB (local dev) ----
+chroma/
+*.sqlite
+*.sqlite3
+*.db
+
+# ---- Eval artifacts (keep reports, ignore scratch) ----
+eval/.cache/
+eval/runs/*/raw/
+
+# ---- Logs ----
+*.log
+logs/
+
+# ---- OS / editors ----
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp
