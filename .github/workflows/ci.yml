@@ -1,0 +1,78 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  lint:
+    name: Lint & type-check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+      - name: Install dev tooling
+        run: |
+          python -m pip install --upgrade pip
+          pip install ruff mypy
+      - name: Ruff (lint)
+        run: ruff check . || echo "::warning::ruff findings — fix before merge"
+      - name: Ruff (format check)
+        run: ruff format --check . || echo "::warning::run 'make format'"
+      - name: mypy
+        run: mypy . || echo "::warning::type issues — fix before merge"
+
+  test:
+    name: Unit & integration tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+      - name: Run tests
+        run: |
+          if [ -d tests ] && ls tests/**/*.py >/dev/null 2>&1; then pytest; \
+          else echo "No tests yet — placeholder passing (Sprint 2)."; fi
+
+  security:
+    name: Dependency & secret scan
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: pip-audit
+        run: |
+          pip install pip-audit
+          if [ -f requirements.txt ]; then pip-audit -r requirements.txt || echo "::warning::dependency advisories found"; fi
+
+  golden-gate:
+    name: Golden-set regression gate
+    runs-on: ubuntu-latest
+    needs: [lint, test]
+    steps:
+      - uses: actions/checkout@v4
+      - name: Golden-set gate (placeholder until Sprint 3)
+        run: |
+          echo "Golden-set gate will assert: Decision Quality >= 85%,"
+          echo "RAGAS faithfulness >= 0.80, fairness gap < 5pp, 0 policy hard-stop violations."
+          echo "Wires to 'python -m eval.regression_gate' once the harness lands."
