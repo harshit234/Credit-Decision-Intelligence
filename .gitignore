@@ -2,7 +2,9 @@
 dataset/lending_club/
 dataset/home-credit-default-risk/
 dataset/unified_training_data.csv
-dataset/eda_plots/
+# Allow EDA plots and sample dataset
+!dataset/eda_plots/
+!dataset/sample_unified_dataset.csv
 
 # ─── Model Artifacts (committed separately via Git LFS if needed) ───────────
 models/*.pkl
