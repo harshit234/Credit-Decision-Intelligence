@@ -3,131 +3,94 @@
 
 **Team Jamun** · Harshit · Ayush · Aditya · Himkar  
 **Program:** Futurense × IIT Gandhinagar · PG Diploma in AI-ML & Agentic AI Engineering · Cohort 1  
-**Capstone Project 02** · Version 1.1 · June 2025
+**Capstone Project 02** · Version 2.0 · June 2025
 
 ---
 
-## 1. The Decision — Which Datasets We Chose and Why
+## 1. The Decision — Why We Pivoted to the American Express Dataset
 
-### 1.1 The Selection Problem
+### 1.1 The Selection Problem & Pivot
 
-Finding data for an underwriting system is not the same as finding data for a generic classification problem. We needed datasets that satisfied four criteria simultaneously:
+Our initial strategy utilized a unified dataset combining LendingClub and Home Credit data. While that provided a good foundation, our mathematical and empirical feasibility analysis revealed a critical limitation: **the theoretical maximum PR-AUC for standard, static loan application datasets capped around 0.75**. Because our goal is to build a highly precise risk engine capable of targeting PR-AUC > 0.90, a flat cross-sectional dataset was insufficient.
 
-1. **Real loan outcomes** — an actual repaid/defaulted label, not a synthetic proxy
-2. **Application-time features only** — no post-origination data (payment history, outstanding balance evolution) that would not be available at the moment a new applicant walks in
-3. **Coverage of thin-file applicants** — our core business problem is lending to people FICO ignores
-4. **Enough volume** for XGBoost/LightGBM to generalise reliably, with enough diversity for fairness testing across segments
-
-We evaluated five candidate datasets before settling on two. The eliminated candidates were:
-
-- **HMEQ (Home Equity)** — 5,960 records, mortgage-only, far too small for production-grade training
-- **Give Me Some Credit (Kaggle)** — 150,000 records, only 11 features, no income verification, no loan purpose, no bureau detail
-- **Prosper Loan Data** — 113,000 records, good features but older vintage (pre-2015), peer-to-peer mechanics differ from direct consumer lending
-
-What remained were two datasets that together cover the full spectrum of Halcyon Credit's applicant population. **We have chosen to merge both datasets into a single Unified Training Dataset** to ensure the risk model learns from both thick-file (standard) and thin-file/international applicants.
-
----
-
-### 1.2 Dataset 1 — LendingClub Loan Data (2007–2020)
-
-**Source:** Kaggle (`wordsforthewise/lending-club`) — originally released by LendingClub Corporation  
-**License:** Public domain / CC0  
-**Size:** 2.9 million rows · 141 columns · ~3.5 GB raw CSV  
-**Scope:** All accepted personal loan applications issued through LendingClub's marketplace from January 2007 through Q3 2020  
-**Loan type:** Unsecured personal loans, $1,000–$40,000, 36 or 60 month terms  
-**Geography:** United States (50 states + DC)
+To accurately predict defaults with precision, we needed **time-series behavioral data**. We pivoted to the **American Express Default Prediction** dataset.
 
 **Why this dataset matters:**
-LendingClub provides high-volume, definitive resolved outcomes (repaid or charged off). It provides critical features like income verification status, FICO ranges, revolving credit utilization, and delinquency history. The sheer volume ensures the XGBoost model has enough data to learn standard applicant behavior.
+Instead of a single snapshot at application time, the AmEx dataset provides up to 13 months of financial behavior leading up to the default event. This allows us to capture the "default spiral"—escalating delinquencies, collapsing spend, and rising balance stress—which are the strongest predictors of credit risk.
 
 ---
 
-### 1.3 Dataset 2 — Home Credit Default Risk (2018)
+### 1.2 American Express Dataset (Kaggle 2022)
 
-**Source:** Kaggle competition (`home-credit-default-risk`), released by Home Credit Group  
-**License:** CC BY 4.0  
-**Size:** 307,511 rows (main application table) · 122 columns in main table · 7 related tables (bureau, bureau_balance, etc.)  
-**Scope:** Loan applications submitted to Home Credit Group across Eastern Europe and Asia  
-**Loan type:** Consumer loans, cash loans, revolving credit  
-**Geography:** International (primarily Czech Republic, Russia, Kazakhstan, Philippines)
-
-**Why this dataset matters:**
-Home Credit was designed specifically to serve the unbanked and underbanked — people with little or no formal credit history. This directly addresses our thin-file evaluation requirements. It also provides `NAME_INCOME_TYPE` (distinguishing salaried, self-employed, pensioners), which is vital for fairness testing across gig and informal workers, a feature absent from LendingClub entirely.
-
----
-
-## 2. How We Use the Datasets Together: The Unified Schema
-
-We have unified both datasets into a single training corpus. The mental model is a **feature harmonization and merge operation**:
-
-```
-LendingClub (Filtered to ~1.2M rows)
-    │
-    ├──► Parse and derive features (thin_file, emp_length, etc.)
-    │
-Home Credit (307K rows + aggregated bureau tables)
-    │
-    ├──► Aggregate bureau features at SK_ID_CURR level
-    │
-    ▼
-[ Unified Schema Mapping & Imputation ]
-    │
-    ├──► Handle missing columns (e.g., impute verification status for HC)
-    ├──► Engineer Derived Features (loan_to_income, debt_burden)
-    │
-    ▼
-Unified Training Dataset (Parquet) -> Used for XGBoost/LightGBM
-```
+**Source:** Kaggle (`amex-default-prediction`) — released by American Express  
+**Size:** 5.5 million raw rows · 190 raw features · 15.27 GB raw CSV  
+**Scope:** 13-month time-series profile for 458,913 unique credit card customers  
+**Target:** Binary default outcome (120 days past due) observed 18 months after the latest credit card statement  
+**Feature Anonymization:** Features are normalized and anonymized into five categories:
+- `D_*`: Delinquency variables
+- `S_*`: Spend variables
+- `P_*`: Payment variables
+- `B_*`: Balance variables
+- `R_*`: Risk variables
 
 ---
 
-## 3. The Target Label
+## 2. Dataset Engineering & Aggregation Strategy
 
-Both datasets are mapped to a binary outcome: `0` (Good Loan / Repaid) and `1` (Bad Loan / Default).
-- **LendingClub:** `Fully Paid` -> 0, `Charged Off` / `Default` -> 1. (Current/Late dropped).
-- **Home Credit:** `TARGET` == 0 -> 0, `TARGET` == 1 -> 1.
+Because the raw data is a time-series (multiple rows per customer), we built a heavy-duty aggregation pipeline to flatten the data for our LightGBM model.
 
-Class imbalance is handled natively via XGBoost's `scale_pos_weight`.
+### 2.1 Customer Sampling Strategy
+To optimize for training speed without losing minority class information:
+- We kept **all 118,828 default customers**.
+- We sampled **180,000 non-default customers**.
+- **Final Training Size:** 298,828 customers (39.76% default rate). This near-balanced ratio removes the need for SMOTE or extreme class weighting.
 
----
+### 2.2 Temporal Feature Aggregation
+For each of the 188 raw features, we computed up to **6 temporal statistics** per customer over their 13-month history:
+1. `mean` (average baseline)
+2. `std` (volatility)
+3. `min` (floor behavior)
+4. `max` (ceiling behavior)
+5. `last` (most recent state - the most critical signal)
+6. `trend` (`last - first` - the direction of movement)
 
-## 4. Feature Reference & Unified Schema Mapping
-
-Below is the mapping used to create the unified feature space from both datasets:
-
-| Unified Feature | LendingClub Source | Home Credit Source | Rationale |
-|-----------------|--------------------|--------------------|-----------|
-| `loan_amount` | `loan_amnt` | `AMT_CREDIT` | Core affordability input |
-| `annual_income` | `annual_inc` | `AMT_INCOME_TOTAL` | Denominator for DTI ratios |
-| `employment_months` | `emp_length` (parsed) | `DAYS_EMPLOYED` (converted) | Stability metric |
-| `credit_score` | `fico_range_low` | `EXT_SOURCE_2` (scaled 300-850) | Bureau risk proxy |
-| `delinquencies_2yr` | `delinq_2yrs` | Extracted from `bureau` | Past due history |
-| `credit_age_months` | `earliest_cr_line` (diff) | `DAYS_CREDIT` (min) | Thin-file proxy |
-| `open_accounts` | `open_acc` | `STATUS=Active` in `bureau` | Credit history breadth |
-| `debt_to_income` | `dti` | Derived (`AMT_ANNUITY * 12 / INCOME`) | Affordability threshold |
-| `revolving_utilisation`| `revol_util` | Extracted from balances | Strongest stress predictor |
-| `income_verified` | `verification_status` | Imputed (`Not Verified`) | Determines confidence |
-| `employment_type` | Imputed (`unknown`) | `NAME_INCOME_TYPE` | Fairness proxy |
-| `thin_file` (Flag) | Derived (`age < 24` or `acc < 3`) | Derived (`age < 24` or `acc < 3`)| Routing & evaluation |
-| `dataset_source` | Hardcoded `"lending_club"` | Hardcoded `"home_credit"` | For segmentation analysis |
-| `label` | `loan_status` (0/1) | `TARGET` (0/1) | Target variable |
-
-### 4.1 Feature Engineering for the Risk Model
-
-The `RiskScoringAgent` uses the following derived features generated during dataset unification:
-- `loan_to_income_ratio`: `loan_amount / max(annual_income, 1)`
-- `income_confidence`: Encoded from `income_verified` (Source Verified=0.9, Verified=0.75, Not Verified=0.4)
-- `verified_income`: `annual_income * income_confidence`
-- `debt_burden_ratio`: Existing monthly debt over verified monthly income.
+This expanded the feature space to over 1,128 baseline temporal features.
 
 ---
 
-## 5. Data Quality Issues & Cleaning Decisions
+## 3. Cross-Feature Engineering (Domain Signals)
 
-- **LendingClub Pre-2013:** Dropped due to high missing values.
-- **LendingClub Income Outliers:** Winsorized at the 99th percentile (~$300,000).
-- **Home Credit DAYS_EMPLOYED:** Fixed the `365243` anomaly (changed to 0, representing non-employed).
-- **Imputation across datasets:** LendingClub lacks `employment_type`, so it's imputed as "unknown". Home Credit lacks `verification_status`, so we conservatively impute it as "Not Verified".
+To push the PR-AUC past 0.90, we engineered 8 composite domain features that capture the multidimensional default spiral:
+
+1. **Delinquency Escalation (`delinquency_escalation`)**: The average trend across 96 `D_` features.
+2. **Spend Collapse (`spend_collapse`)**: The inverted trend across 21 `S_` features.
+3. **Balance Stress (`balance_stress`)**: The average trend across 40 `B_` features.
+4. **Risk Composite (`risk_composite_last`)**: The average of the most recent `R_` features.
+5. **Payment-to-Balance Ratio (`payment_to_balance`)**: `P_2_last / B_2_last`.
+6. **Delinquency Volatility (`delinquency_volatility`)**: The average standard deviation across 96 `D_` features.
+7. **Composite Stress Score**: An unweighted average of the delinquency, spend, balance, and risk composites.
+
+**Final Feature Count:** 1,136 features.
+
+---
+
+## 4. The Target Label
+
+- **`0` (Good Loan / Non-Default):** The customer did not default within the 18-month observation window.
+- **`1` (Default):** The customer reached 120 days past due within the 18-month observation window.
+
+---
+
+## 5. Final Model Performance (LightGBM)
+
+By leveraging the rich temporal features and our engineered composites, the LightGBM model achieved the following metrics on the hold-out test set (59,766 customers):
+
+- **PR-AUC:** 0.9378 (Target >0.90 ✅)
+- **ROC-AUC:** 0.9610
+- **Accuracy:** 89.47%
+- **Default Recall:** 91.69%
+
+*See `eda_report.md` artifact for detailed calibration curves, PR curves, and SHAP feature importance plots.*
 
 ---
 
