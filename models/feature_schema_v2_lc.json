@@ -1,0 +1,116 @@
+{
+  "model_version": "lgbm_halcyon_v2_lc",
+  "model_type": "LightGBM",
+  "trained_at": "2026-07-19T23:52:16.314618",
+  "dataset": "LendingClub (raw loan.csv) \u2014 Real FICO Scores",
+  "n_train_rows": 1042280,
+  "feature_count": 41,
+  "feature_names": [
+    "sub_grade_encoded",
+    "grade_encoded",
+    "dti",
+    "revol_util",
+    "revol_bal_to_income",
+    "loan_to_income",
+    "installment_to_income",
+    "delinq_2yrs",
+    "pct_tl_nvr_dlq",
+    "num_tl_90g_dpd_24m",
+    "num_tl_30dpd",
+    "num_actv_rev_tl",
+    "has_public_record",
+    "pub_rec",
+    "pub_rec_bankruptcies",
+    "credit_age_months",
+    "open_acc",
+    "total_acc",
+    "mort_acc",
+    "num_bc_tl",
+    "num_il_tl",
+    "acc_open_past_24mths",
+    "tot_cur_bal",
+    "tot_hi_cred_lim",
+    "avg_cur_bal",
+    "bc_util",
+    "il_util",
+    "all_util",
+    "total_rev_hi_lim",
+    "annual_inc",
+    "loan_amnt",
+    "int_rate",
+    "installment",
+    "term_months",
+    "employment_months",
+    "income_confidence",
+    "verified_income",
+    "inq_last_6mths",
+    "purpose_risk",
+    "home_own_encoded",
+    "thin_file"
+  ],
+  "key_fix": "Uses real fico_range_low/high (avg) instead of grade-derived proxy",
+  "target_column": "label",
+  "optimal_threshold": 0.2687,
+  "risk_bands": {
+    "Low": "score < 0.25",
+    "Medium": "0.25 <= score < 0.27",
+    "High": "score >= 0.27"
+  },
+  "evaluation_metrics": {
+    "roc_auc": 0.7166,
+    "pr_auc": 0.3854,
+    "accuracy": 0.6626,
+    "f1_default": 0.4346,
+    "default_recall": 0.6462
+  },
+  "top_10_features": [
+    {
+      "feature": "sub_grade_encoded",
+      "gain": 1128535.77
+    },
+    {
+      "feature": "int_rate",
+      "gain": 339609.94
+    },
+    {
+      "feature": "grade_encoded",
+      "gain": 337648.6
+    },
+    {
+      "feature": "term_months",
+      "gain": 88145.64
+    },
+    {
+      "feature": "all_util",
+      "gain": 84624.72
+    },
+    {
+      "feature": "avg_cur_bal",
+      "gain": 69181.14
+    },
+    {
+      "feature": "loan_to_income",
+      "gain": 68960.88
+    },
+    {
+      "feature": "acc_open_past_24mths",
+      "gain": 37174.05
+    },
+    {
+      "feature": "dti",
+      "gain": 31052.48
+    },
+    {
+      "feature": "employment_months",
+      "gain": 26156.87
+    }
+  ],
+  "pipeline_compatibility": {
+    "all_features_from_application_form": true,
+    "human_readable_feature_names": true,
+    "shap_explainable": true,
+    "no_anonymized_features": true,
+    "thin_file_signal_included": true,
+    "public_record_signal_included": true
+  }
+}

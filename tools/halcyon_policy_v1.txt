@@ -1,0 +1,169 @@
+HALCYON CREDIT — LENDING POLICY KNOWLEDGE BASE
+Version 1.0 | Effective Date: January 2025
+Classification: Internal — Underwriting Operations
+
+This document defines the complete set of lending policy clauses used by Halcyon Credit
+for consumer loan underwriting decisions. All automated and human underwriting decisions
+must be consistent with the clauses defined herein. Each clause is assigned a unique
+identifier and hard-stop status. Hard-stop clauses mandate an automatic decline and
+cannot be overridden by discretion alone.
+
+================================================================================
+CLAUSE POL-001 — Debt-to-Income Ceiling (HARD STOP)
+================================================================================
+Policy ID    : POL-001
+Category     : Affordability
+Hard Stop    : YES
+Threshold    : DTI > 40%
+Applies To   : All applicant types (salaried, self-employed, gig, commercial)
+
+Full Text:
+Halcyon Credit's maximum allowable debt-to-income ratio for all standard consumer
+loan applicants is forty percent (40%). Debt-to-income ratio is calculated as the
+sum of all existing monthly debt obligations divided by the applicant's gross monthly
+income, expressed as a percentage. A DTI above 40% indicates that existing obligations
+already consume a disproportionate share of the applicant's income before the new loan
+payment is added, creating an unacceptable repayment risk. Applications where the
+verified DTI exceeds 40% must be declined regardless of credit score, income level,
+loan purpose, or other mitigating factors. This clause is a hard stop and is not
+subject to senior underwriter override without formal credit committee review.
+
+Rationale: Empirical data from the LendingClub loan portfolio shows default rates
+climbing steeply above DTI=35%, reaching 38% at DTI=50%. The 40% ceiling balances
+access to credit with responsible lending.
+
+================================================================================
+CLAUSE POL-002 — Public Record Hard Stop (HARD STOP)
+================================================================================
+Policy ID    : POL-002
+Category     : Credit History
+Hard Stop    : YES
+Threshold    : Any public record present (pub_rec >= 1)
+Applies To   : All applicant types
+
+Full Text:
+Any applicant with one or more public records on file — including but not limited to
+bankruptcies, civil judgements, tax liens, or wage garnishments — must be declined.
+Public records represent legal findings of financial failure or fraud and are the
+strongest individual predictors of future default available in the credit bureau data.
+This is an unconditional hard stop. No volume of positive compensating factors
+(high income, low DTI, strong credit score) can override a positive public record
+finding. Applicants with a public record who believe the record is in error must
+dispute it with the relevant credit bureau before reapplying.
+
+Rationale: A public record (particularly bankruptcy) increases default probability
+by a factor of 3-5x relative to otherwise similar applicants. Halcyon Credit cannot
+price this risk at retail consumer loan rates.
+
+================================================================================
+CLAUSE POL-003 — High Loan-to-Income Ratio Review (ADVISORY FLAG)
+================================================================================
+Policy ID    : POL-003
+Category     : Affordability
+Hard Stop    : NO
+Threshold    : loan_amount / annual_income > 3.0
+Applies To   : All applicant types
+
+Full Text:
+When the requested loan amount exceeds three times (3.0x) the applicant's verified
+annual income, the application must be flagged for senior underwriter review before
+a final decision is issued. This threshold signals that the loan represents a
+significant multiple of the applicant's earning capacity, increasing vulnerability
+to income disruption. Automated approval is not permitted when this flag is triggered.
+The reviewing underwriter must document the compensating factors that justify approval
+if a positive decision is made. This clause does not mandate decline — a well-qualified
+applicant with a loan-to-income ratio above 3.0 may still be approved with appropriate
+conditions.
+
+================================================================================
+CLAUSE POL-004 — Debt Consolidation Income Re-verification (ADVISORY FLAG)
+================================================================================
+Policy ID    : POL-004
+Category     : Loan Purpose
+Hard Stop    : NO
+Threshold    : loan_purpose = debt_consolidation AND DTI > 35%
+Applies To   : All applicant types
+
+Full Text:
+Debt consolidation applications submitted by applicants with a debt-to-income ratio
+above thirty-five percent (35%) require mandatory income re-verification before
+approval. Borrowers seeking to consolidate existing debt at elevated DTI levels are
+frequently in active financial distress at the time of application. Stated income
+figures for this segment are more likely to be overstated or based on variable
+income sources. Re-verification must confirm the income figure through at least one
+of: employer payroll confirmation, most recent two months of bank statements, or
+prior year tax return. This is an advisory flag, not a hard stop — the application
+may proceed to approval once re-verification is complete.
+
+================================================================================
+CLAUSE POL-005 — Thin File Referral Mandate (ADVISORY FLAG)
+================================================================================
+Policy ID    : POL-005
+Category     : Credit History — Thin File
+Hard Stop    : NO — automatic decline is PROHIBITED
+Threshold    : credit_age_months < 24 OR open_accounts < 3
+Applies To   : All applicant types
+
+Full Text:
+Applicants who qualify as thin-file borrowers — defined as those with a credit history
+shorter than twenty-four (24) months OR fewer than three (3) open credit accounts —
+must be referred to a human underwriter for review. Automatic decline of thin-file
+applicants is explicitly prohibited under Halcyon Credit's fair lending commitment
+and is not supported by empirical evidence. Analysis of the Home Credit dataset shows
+that thin-file applicants, when evaluated holistically including income stability,
+employment duration, and purpose, default at only 2-3 percentage points above
+applicants with established credit histories. Human review must assess non-bureau
+signals including: length of employment, income verification confidence, payment
+history on utilities, and stated loan purpose. The reviewing underwriter may approve,
+refer, or decline after documenting the specific factors considered.
+
+Rationale: Thin-file applicants represent the core underserved segment Halcyon
+Credit exists to serve. An automatic decline policy for this group would undermine
+the company's mission and expose Halcyon to fair lending regulatory risk.
+
+================================================================================
+CLAUSE POL-006 — Multiple Delinquencies Referral (ADVISORY FLAG)
+================================================================================
+Policy ID    : POL-006
+Category     : Credit History
+Hard Stop    : NO
+Threshold    : delinquencies in past 24 months >= 2
+Applies To   : All applicant types
+
+Full Text:
+Applicants with two or more delinquencies (30+ days past due) recorded in the past
+twenty-four months must be referred for senior underwriter review. A single delinquency
+may reflect a one-time hardship event; two or more delinquencies within a 24-month
+window suggest a pattern of payment difficulty that requires human judgement to
+properly contextualize. The reviewing underwriter must assess whether the delinquencies
+are recent or historic, whether they cluster around a documented hardship event
+(job loss, medical emergency), and whether the applicant's current financial position
+has materially improved. Approval is permitted with documented compensating factors.
+
+================================================================================
+CLAUSE POL-007 — Minimum Credit Score Hard Stop (HARD STOP)
+================================================================================
+Policy ID    : POL-007
+Category     : Credit Quality
+Hard Stop    : YES
+Threshold    : credit_score < 580 AND thin_file = FALSE
+Applies To   : Standard (thick-file) applicants only
+
+Full Text:
+Standard applicants — those who do not qualify as thin-file under POL-005 — with a
+credit score below five hundred and eighty (580) must be declined. A credit score
+below 580 in an applicant with an established credit history (24+ months, 3+ accounts)
+reflects a documented pattern of credit mismanagement rather than simple lack of
+history. At this score level, default probability significantly exceeds Halcyon
+Credit's risk tolerance at retail consumer loan pricing. This hard stop explicitly
+does NOT apply to thin-file applicants, who are handled under POL-005 and must
+always be referred rather than automatically declined.
+
+Note: For applicants whose credit score is derived from an external scoring model
+(such as Home Credit's EXT_SOURCE_2 normalised to the 300-850 range), the same
+threshold of 580 applies. The normalisation methodology is documented in the
+dataset card.
+
+================================================================================
+END OF HALCYON CREDIT POLICY DOCUMENT v1.0
+================================================================================
