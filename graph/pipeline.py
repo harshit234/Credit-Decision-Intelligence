@@ -19,7 +19,7 @@
                               │
                           evaluate      (Ayush)
                          ┌────┴────┐
-                      [pass]  [retry → synthesize, max 2×]
+                      [pass]  [retry -> synthesize, max 2x]
                          │
                      write_record  (Harshit)
 ================================================================================
@@ -116,26 +116,26 @@ def retry_or_persist_router(state: ApplicationState) -> str:
     """
     Conditional edge from evaluate node.
     Returns:
-        "synthesize" → retry (eval failed and retries remaining)
-        "write_record" → proceed (eval passed or retries exhausted)
+        "synthesize"   -> retry (eval failed and retries remaining)
+        "write_record" -> proceed (eval passed or retries exhausted)
     """
     ev          = state.get("eval_result")
     retry_count = state.get("retry_count", 0)
 
     if ev is None:
-        print(f"  [Router] No eval_result → write_record")
+        print(f"  [Router] No eval_result -> write_record")
         return "write_record"
 
     if ev.pass_flag:
-        print(f"  [Router] Faithfulness={ev.faithfulness:.3f} ≥ threshold → write_record")
+        print(f"  [Router] Faithfulness={ev.faithfulness:.3f} >= threshold -> write_record")
         return "write_record"
 
     if retry_count >= MAX_RETRIES:
-        print(f"  [Router] Retries exhausted ({retry_count}/{MAX_RETRIES}) → write_record (ESCALATED)")
+        print(f"  [Router] Retries exhausted ({retry_count}/{MAX_RETRIES}) -> write_record (ESCALATED)")
         return "write_record"
 
     print(f"  [Router] Faithfulness={ev.faithfulness:.3f} < threshold "
-          f"→ synthesize (retry {retry_count}/{MAX_RETRIES})")
+          f"-> synthesize (retry {retry_count}/{MAX_RETRIES})")
     return "synthesize"
 
 

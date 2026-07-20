@@ -20,21 +20,20 @@ load_dotenv()
 # CONFIG — pulled from .env
 # ─────────────────────────────────────────────────────────────────────────────
 OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY", "")
-CHEAP_MODEL        = os.getenv("CHEAP_MODEL",  "openrouter/google/gemini-2.0-flash-001")
-STRONG_MODEL       = os.getenv("STRONG_MODEL", "openrouter/google/gemini-2.0-flash-001")
+OPENROUTER_BASE    = "https://openrouter.ai/api/v1"
+CHEAP_MODEL        = os.getenv("CHEAP_MODEL",  "google/gemini-2.0-flash-001")
+STRONG_MODEL       = os.getenv("STRONG_MODEL", "google/gemini-2.0-flash-001")
 COST_CEILING       = float(os.getenv("COST_CEILING_USD", "0.10"))
 
 # LiteLLM OpenRouter setup
-litellm.api_key = OPENROUTER_API_KEY
+litellm.drop_params = True    # silently ignore unsupported params
+litellm.set_verbose = False
 
 # Extra headers OpenRouter recommends
 _EXTRA_HEADERS = {
     "HTTP-Referer": "https://github.com/harshit234/Credit-Decision-Intelligence",
     "X-Title":      "Halcyon Credit Agentic Underwriting Copilot",
 }
-
-# Suppress litellm verbose output
-litellm.set_verbose = False
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -67,7 +66,8 @@ def _llm_call(
             messages       = messages,
             max_tokens     = max_tokens,
             temperature    = temperature,
-            api_base       = "https://openrouter.ai/api/v1",
+            api_base       = OPENROUTER_BASE,
+            api_key        = OPENROUTER_API_KEY,
             extra_headers  = _EXTRA_HEADERS,
         )
         latency_ms = (time.time() - t0) * 1000
