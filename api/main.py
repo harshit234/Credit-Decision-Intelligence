@@ -16,6 +16,7 @@ load_dotenv()
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from api.routes import router
+from api.routes_v2 import router_v2
 
 app = FastAPI(
     title       = "Halcyon Credit — Agentic Underwriting Copilot",
@@ -37,7 +38,8 @@ app.add_middleware(
     allow_headers     = ["*"],
 )
 
-app.include_router(router, prefix="")
+app.include_router(router,    prefix="")
+app.include_router(router_v2, prefix="")
 
 
 if __name__ == "__main__":

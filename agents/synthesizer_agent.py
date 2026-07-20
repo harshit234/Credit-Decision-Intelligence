@@ -17,27 +17,10 @@ from state.application_state import (
     ApplicationState, Decision, AgentError, log_event
 )
 from gateway.router import strong_llm_call, parse_json_response
+from gateway.prompts import SYNTHESIZER_SYSTEM_PROMPT_V2
 
-AGENT = "DecisionSynthesizerAgent"
-
-SYSTEM_PROMPT = """You are a loan underwriting decision engine for Halcyon Credit.
-Your job is to produce a structured loan decision based ONLY on the data provided.
-
-OUTPUT FORMAT — respond with valid JSON only, no markdown fences, no extra text:
-{
-  "recommendation": "APPROVE" | "DECLINE" | "REFER",
-  "reasons": ["reason 1 citing source", "reason 2 citing source"],
-  "conditions": ["condition if APPROVE with conditions, else empty list"]
-}
-
-RULES:
-1. recommendation must be exactly APPROVE, DECLINE, or REFER.
-2. If ANY hard stop is triggered (hard_stops list is non-empty), you MUST output DECLINE.
-3. If thin_file flag is set or POL-005 is in flags, you MUST output REFER (not DECLINE).
-4. Each reason MUST cite its source field in brackets e.g. [credit_report.credit_score=620].
-5. Do NOT invent facts not present in the input data.
-6. Keep reasons concise — maximum 2 sentences each, maximum 5 reasons total.
-7. conditions is only used when recommendation=APPROVE and there are advisory flags."""
+AGENT       = "DecisionSynthesizerAgent"
+SYSTEM_PROMPT = SYNTHESIZER_SYSTEM_PROMPT_V2
 
 
 def _build_context(state: ApplicationState) -> str:
