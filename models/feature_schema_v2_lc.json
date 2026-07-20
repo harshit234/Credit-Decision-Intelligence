@@ -1,7 +1,7 @@
 {
   "model_version": "lgbm_halcyon_v2_lc",
   "model_type": "LightGBM",
-  "trained_at": "2026-07-19T23:52:16.314618",
+  "trained_at": "2026-07-20T14:31:30.928764",
   "dataset": "LendingClub (raw loan.csv) \u2014 Real FICO Scores",
   "n_train_rows": 1042280,
   "feature_count": 41,
