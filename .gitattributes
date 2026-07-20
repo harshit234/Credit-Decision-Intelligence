@@ -1,0 +1,15 @@
+# Treat LightGBM model files as binary — never apply CRLF conversion
+models/*.txt binary
+models/*.json text eol=lf
+
+# Python / markdown — use LF
+*.py text eol=lf
+*.md text eol=lf
+*.yaml text eol=lf
+*.json text eol=lf
+*.env text eol=lf
+*.txt text eol=lf
+
+# PNG / images — binary
+*.png binary
+*.jpg binary
