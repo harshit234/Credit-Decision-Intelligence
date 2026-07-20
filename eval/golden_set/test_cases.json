@@ -1,0 +1,162 @@
+[
+  {
+    "id": "TC-001",
+    "description": "Standard approval — healthy credit, low DTI",
+    "input": {
+      "applicant_id": "APL-TC001", "name": "Rohan Mehta",
+      "loan_amount": 200000, "loan_purpose": "home_improvement", "loan_term_months": 36,
+      "annual_income": 900000, "employment_type": "salaried", "months_employed": 48,
+      "verification_status": "Source Verified", "existing_debts": 5000,
+      "credit_score": 740, "delinquencies_2yr": 0, "open_accounts": 8,
+      "revolving_utilisation": 18.0, "credit_age_months": 84,
+      "public_records": 0, "inquiries_6mo": 1, "home_ownership": "MORTGAGE"
+    },
+    "expected_recommendation": "APPROVE",
+    "expected_policy_clauses": [],
+    "notes": "High score, low DTI (~6.7%), verified income — clean approval"
+  },
+  {
+    "id": "TC-002",
+    "description": "Hard stop — bankruptcy on record (POL-002)",
+    "input": {
+      "applicant_id": "APL-TC002", "name": "Priya Sharma",
+      "loan_amount": 150000, "loan_purpose": "debt_consolidation", "loan_term_months": 60,
+      "annual_income": 600000, "employment_type": "salaried", "months_employed": 24,
+      "verification_status": "Verified", "existing_debts": 8000,
+      "credit_score": 620, "delinquencies_2yr": 1, "open_accounts": 5,
+      "revolving_utilisation": 55.0, "credit_age_months": 60,
+      "public_records": 1, "inquiries_6mo": 3, "home_ownership": "RENT"
+    },
+    "expected_recommendation": "DECLINE",
+    "expected_policy_clauses": ["POL-002"],
+    "notes": "Public record present — POL-002 hard stop, must DECLINE"
+  },
+  {
+    "id": "TC-003",
+    "description": "Thin file — REFER mandatory (POL-005)",
+    "input": {
+      "applicant_id": "APL-TC003", "name": "Arjun Patel",
+      "loan_amount": 75000, "loan_purpose": "car", "loan_term_months": 36,
+      "annual_income": 480000, "employment_type": "salaried", "months_employed": 12,
+      "verification_status": "Verified", "existing_debts": 2000,
+      "credit_score": 650, "delinquencies_2yr": 0, "open_accounts": 2,
+      "revolving_utilisation": 20.0, "credit_age_months": 18,
+      "public_records": 0, "inquiries_6mo": 0, "home_ownership": "RENT"
+    },
+    "expected_recommendation": "REFER",
+    "expected_policy_clauses": ["POL-005"],
+    "notes": "Credit age 18mo < 24mo AND open_accounts 2 < 3 → thin file → must REFER"
+  },
+  {
+    "id": "TC-004",
+    "description": "Hard stop — DTI exceeds 40% (POL-001)",
+    "input": {
+      "applicant_id": "APL-TC004", "name": "Kavita Singh",
+      "loan_amount": 300000, "loan_purpose": "medical", "loan_term_months": 60,
+      "annual_income": 400000, "employment_type": "self-employed", "months_employed": 36,
+      "verification_status": "Not Verified", "existing_debts": 15000,
+      "credit_score": 660, "delinquencies_2yr": 0, "open_accounts": 6,
+      "revolving_utilisation": 60.0, "credit_age_months": 72,
+      "public_records": 0, "inquiries_6mo": 2, "home_ownership": "RENT"
+    },
+    "expected_recommendation": "DECLINE",
+    "expected_policy_clauses": ["POL-001"],
+    "notes": "DTI = (15000*12)/400000 = 45% > 40% → POL-001 hard stop"
+  },
+  {
+    "id": "TC-005",
+    "description": "Multiple delinquencies — REFER (POL-006)",
+    "input": {
+      "applicant_id": "APL-TC005", "name": "Rahul Gupta",
+      "loan_amount": 100000, "loan_purpose": "other", "loan_term_months": 36,
+      "annual_income": 550000, "employment_type": "salaried", "months_employed": 30,
+      "verification_status": "Verified", "existing_debts": 5000,
+      "credit_score": 630, "delinquencies_2yr": 3, "open_accounts": 5,
+      "revolving_utilisation": 70.0, "credit_age_months": 48,
+      "public_records": 0, "inquiries_6mo": 4, "home_ownership": "RENT"
+    },
+    "expected_recommendation": "REFER",
+    "expected_policy_clauses": ["POL-006"],
+    "notes": "3 delinquencies in 2yr → POL-006 mandatory REFER"
+  },
+  {
+    "id": "TC-006",
+    "description": "Credit score below 580 — DECLINE (POL-007)",
+    "input": {
+      "applicant_id": "APL-TC006", "name": "Suresh Kumar",
+      "loan_amount": 50000, "loan_purpose": "car", "loan_term_months": 36,
+      "annual_income": 350000, "employment_type": "gig", "months_employed": 6,
+      "verification_status": "Not Verified", "existing_debts": 3000,
+      "credit_score": 560, "delinquencies_2yr": 1, "open_accounts": 4,
+      "revolving_utilisation": 80.0, "credit_age_months": 36,
+      "public_records": 0, "inquiries_6mo": 5, "home_ownership": "RENT"
+    },
+    "expected_recommendation": "DECLINE",
+    "expected_policy_clauses": ["POL-007"],
+    "notes": "Score 560 < 580, not thin-file → POL-007 hard stop DECLINE"
+  },
+  {
+    "id": "TC-007",
+    "description": "High LTI advisory flag — REFER (POL-003)",
+    "input": {
+      "applicant_id": "APL-TC007", "name": "Ananya Roy",
+      "loan_amount": 1500000, "loan_purpose": "home_improvement", "loan_term_months": 60,
+      "annual_income": 420000, "employment_type": "salaried", "months_employed": 60,
+      "verification_status": "Source Verified", "existing_debts": 4000,
+      "credit_score": 710, "delinquencies_2yr": 0, "open_accounts": 7,
+      "revolving_utilisation": 30.0, "credit_age_months": 96,
+      "public_records": 0, "inquiries_6mo": 0, "home_ownership": "MORTGAGE"
+    },
+    "expected_recommendation": "REFER",
+    "expected_policy_clauses": ["POL-003"],
+    "notes": "LTI = 1500000/420000 = 3.57 > 3.0 → POL-003 senior review required"
+  },
+  {
+    "id": "TC-008",
+    "description": "Debt consolidation with high DTI (POL-004)",
+    "input": {
+      "applicant_id": "APL-TC008", "name": "Vikram Nair",
+      "loan_amount": 400000, "loan_purpose": "debt_consolidation", "loan_term_months": 60,
+      "annual_income": 700000, "employment_type": "salaried", "months_employed": 48,
+      "verification_status": "Verified", "existing_debts": 22000,
+      "credit_score": 680, "delinquencies_2yr": 0, "open_accounts": 9,
+      "revolving_utilisation": 65.0, "credit_age_months": 120,
+      "public_records": 0, "inquiries_6mo": 2, "home_ownership": "MORTGAGE"
+    },
+    "expected_recommendation": "REFER",
+    "expected_policy_clauses": ["POL-004"],
+    "notes": "Debt consolidation + DTI = 37.7% > 35% → POL-004 income re-verify required"
+  },
+  {
+    "id": "TC-009",
+    "description": "Excellent credit — premium approval",
+    "input": {
+      "applicant_id": "APL-TC009", "name": "Deepika Iyer",
+      "loan_amount": 500000, "loan_purpose": "home_improvement", "loan_term_months": 60,
+      "annual_income": 2000000, "employment_type": "salaried", "months_employed": 120,
+      "verification_status": "Source Verified", "existing_debts": 10000,
+      "credit_score": 800, "delinquencies_2yr": 0, "open_accounts": 15,
+      "revolving_utilisation": 8.0, "credit_age_months": 240,
+      "public_records": 0, "inquiries_6mo": 0, "home_ownership": "OWN"
+    },
+    "expected_recommendation": "APPROVE",
+    "expected_policy_clauses": [],
+    "notes": "800 FICO, 20yr credit history, 6% DTI — clear APPROVE"
+  },
+  {
+    "id": "TC-010",
+    "description": "Borderline case — medium risk",
+    "input": {
+      "applicant_id": "APL-TC010", "name": "Mohit Agarwal",
+      "loan_amount": 250000, "loan_purpose": "medical", "loan_term_months": 36,
+      "annual_income": 650000, "employment_type": "salaried", "months_employed": 18,
+      "verification_status": "Verified", "existing_debts": 8000,
+      "credit_score": 650, "delinquencies_2yr": 1, "open_accounts": 5,
+      "revolving_utilisation": 45.0, "credit_age_months": 48,
+      "public_records": 0, "inquiries_6mo": 3, "home_ownership": "RENT"
+    },
+    "expected_recommendation": "REFER",
+    "expected_policy_clauses": [],
+    "notes": "Borderline — DTI 14.8%, one delinquency, medium utilization → likely REFER"
+  }
+]
