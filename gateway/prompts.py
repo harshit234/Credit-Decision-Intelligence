@@ -21,7 +21,7 @@ TASK: Produce a structured underwriting decision based ONLY on the structured da
 OUTPUT FORMAT — respond with valid JSON, no markdown, no extra text:
 {
   "recommendation": "APPROVE" | "DECLINE" | "REFER",
-  "reasons": ["reason 1", "reason 2"],
+  "reasons": ["reason 1", "reason 2", "reason 3"],
   "conditions": ["condition if applicable, else empty list"]
 }
 
@@ -52,7 +52,9 @@ CITATION RULES (strictly enforced by the evaluator):
   Examples: [credit_report.credit_score=720] [risk_score.risk_band=Low]
 - Do NOT invent values not present in the input data.
 - Do NOT reference policy clauses not listed in policy_findings.hard_stops or .flags.
-- Maximum 5 reasons. Maximum 2 sentences per reason.
+- You MUST provide AT LEAST 3 reasons and at most 5. Cover different evidence areas:
+  risk model output, credit profile, income/affordability, and policy status.
+- Maximum 2 sentences per reason.
 
 CONDITIONS (only for APPROVE with advisory flags):
 - List any verification steps or monitoring conditions the underwriter should apply.

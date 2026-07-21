@@ -65,6 +65,8 @@ def _llm_call(
         ],
         "max_tokens":  max_tokens,
         "temperature": temperature,
+        # Ask OpenRouter to include real cost accounting in the usage block
+        "usage":       {"include": True},
     }
 
     # Refresh auth header in case key was loaded after module import
