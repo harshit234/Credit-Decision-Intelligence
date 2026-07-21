@@ -39,7 +39,12 @@ def _build_context(state: ApplicationState) -> str:
             "loan_purpose":    af.loan_purpose,
             "loan_term_months":af.loan_term_months,
             "employment_type": af.employment_type,
+            "months_employed": af.months_employed,
             "home_ownership":  af.home_ownership,
+            "annual_income":   af.annual_income,
+            "existing_monthly_debts": af.existing_debts,
+            "dti_pct":         round((af.existing_debts * 12) / max(af.annual_income, 1) * 100, 1),
+            "loan_to_income":  round(af.loan_amount / max(af.annual_income, 1), 2),
         },
         "income_verified": {
             "verified_income": inc.verified_income if inc else None,
@@ -125,9 +130,47 @@ def synthesize_node(state: ApplicationState) -> dict:
             if "POL-005" in pf_flags or (not pf):
                 rec = "REFER"
 
+        # Ensure at least 3 auditable reasons — supplement with grounded
+        # data-cited reasons if the LLM returned fewer.
+        reasons = parsed.get("reasons", ["Insufficient data for reasoning."])
+        if len(reasons) < 3:
+            rs  = state.get("risk_score")
+            inc = state.get("income_verified")
+            supplemental = []
+            if rs:
+                supplemental.append(
+                    f"Risk model assessed a default probability of {rs.risk_score:.3f}, "
+                    f"placing the applicant in the {rs.risk_band} risk band "
+                    f"[risk_score.risk_band={rs.risk_band}]."
+                )
+            if cr:
+                supplemental.append(
+                    f"Credit profile: score {cr.credit_score} with {cr.delinquencies} "
+                    f"delinquencies in 24 months, revolving utilisation "
+                    f"{cr.utilization_pct}%, and {cr.credit_age_months} months of credit history "
+                    f"[credit_report.credit_score={cr.credit_score}]."
+                )
+            if inc:
+                supplemental.append(
+                    f"Verified income of {inc.verified_income:,.0f} "
+                    f"(confidence {inc.confidence:.0%}) was used to assess affordability "
+                    f"[income_verified.verified_income={inc.verified_income:,.0f}]."
+                )
+            if pf is not None:
+                stops_txt = ", ".join(pf.hard_stops) if pf.hard_stops else "none"
+                flags_txt = ", ".join(pf.flags) if pf.flags else "none"
+                supplemental.append(
+                    f"Policy compliance check: hard stops — {stops_txt}; advisory flags — {flags_txt} "
+                    f"[policy_findings.hard_stops={stops_txt}]."
+                )
+            for s in supplemental:
+                if len(reasons) >= 3:
+                    break
+                reasons.append(s)
+
         decision = Decision(
             recommendation = rec,
-            reasons        = parsed.get("reasons", ["Insufficient data for reasoning."]),
+            reasons        = reasons,
             conditions     = parsed.get("conditions", []),
             draft_version  = draft_ver,
         )

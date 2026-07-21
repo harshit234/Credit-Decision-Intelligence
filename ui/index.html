@@ -3,587 +3,937 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Halcyon Credit | Agentic Underwriting Copilot</title>
-<meta name="description" content="AI-powered loan underwriting decisions by Team Jamun — Futurense x IIT Gandhinagar PG Diploma in AI-ML Capstone Project 02.">
+<title>Halcyon Credit — Agentic Underwriting Copilot</title>
+<meta name="description" content="Halcyon Credit — AI-assisted loan underwriting with explainable, auditable decisions.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
   :root {
-    --bg:        #0a0c14;
-    --surface:   #111520;
-    --card:      #161b2e;
-    --border:    #1e2740;
-    --accent:    #4f7cff;
-    --accent2:   #7c4fff;
-    --green:     #22d3a0;
-    --red:       #ff4f6a;
-    --amber:     #f5a623;
-    --text:      #e4e8f5;
-    --muted:     #6b7899;
-    --radius:    12px;
-    --glow:      0 0 24px rgba(79,124,255,0.15);
+    --navy:       #0e2a47;
+    --navy-deep:  #081d33;
+    --gold:       #b9912f;
+    --gold-soft:  #d9b968;
+    --bg:         #f5f6f8;
+    --card:       #ffffff;
+    --border:     #e3e7ee;
+    --text:       #1d2733;
+    --muted:      #6a7686;
+    --green:      #1e8e5a;
+    --green-bg:   #e9f7f0;
+    --red:        #c0392b;
+    --red-bg:     #fdeeec;
+    --amber:      #b07d1a;
+    --amber-bg:   #fdf6e5;
+    --radius:     14px;
+    --shadow:     0 1px 3px rgba(14,42,71,0.06), 0 8px 24px rgba(14,42,71,0.06);
   }
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
   body {
     font-family: 'Inter', sans-serif;
     background: var(--bg);
     color: var(--text);
     min-height: 100vh;
-    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
   }
 
-  /* ── Navbar ── */
-  nav {
-    display: flex; align-items: center; justify-content: space-between;
-    padding: 18px 40px;
-    background: rgba(17,21,32,0.85);
-    backdrop-filter: blur(12px);
-    border-bottom: 1px solid var(--border);
+  /* ════════════════════════ HEADER ════════════════════════ */
+  header {
+    background: linear-gradient(180deg, var(--navy-deep) 0%, var(--navy) 100%);
+    border-bottom: 3px solid var(--gold);
+    padding: 26px 20px 22px;
+    text-align: center;
     position: sticky; top: 0; z-index: 100;
+    box-shadow: 0 2px 12px rgba(8,29,51,0.25);
   }
-  .logo { display: flex; align-items: center; gap: 10px; }
-  .logo-icon {
-    width: 32px; height: 32px; border-radius: 8px;
-    background: linear-gradient(135deg, var(--accent), var(--accent2));
-    display: flex; align-items: center; justify-content: center;
-    font-size: 16px;
+  .brand { display: inline-flex; align-items: center; justify-content: center; gap: 16px; }
+  .brand-logo { width: 52px; height: 52px; flex-shrink: 0; }
+  .brand-text { text-align: left; }
+  .brand-name {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 30px; font-weight: 700; color: #fff;
+    letter-spacing: 3px; text-transform: uppercase; line-height: 1;
   }
-  .logo-text { font-size: 18px; font-weight: 700; letter-spacing: -0.3px; }
-  .logo-sub  { font-size: 11px; color: var(--muted); margin-top: 1px; }
-  .nav-badge {
-    background: rgba(79,124,255,0.15); border: 1px solid rgba(79,124,255,0.3);
-    color: var(--accent); padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 600;
-  }
-
-  /* ── Hero ── */
-  .hero {
-    text-align: center; padding: 80px 20px 48px;
-    background: radial-gradient(ellipse 70% 40% at 50% 0%, rgba(79,124,255,0.08), transparent);
-  }
-  .hero-tag {
-    display: inline-block; background: rgba(79,124,255,0.12);
-    border: 1px solid rgba(79,124,255,0.25); color: var(--accent);
-    padding: 5px 14px; border-radius: 20px; font-size: 12px; font-weight: 600;
-    letter-spacing: 0.5px; margin-bottom: 20px;
-  }
-  .hero h1 {
-    font-size: clamp(28px, 5vw, 52px); font-weight: 700;
-    letter-spacing: -1px; line-height: 1.15;
-    background: linear-gradient(135deg, #fff 40%, var(--accent));
-    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-  }
-  .hero p {
-    color: var(--muted); margin-top: 16px; font-size: 16px; max-width: 560px; margin-inline: auto;
+  .brand-name .gold { color: var(--gold-soft); }
+  .brand-tag {
+    font-size: 11px; color: rgba(255,255,255,0.65);
+    letter-spacing: 2.5px; text-transform: uppercase; margin-top: 6px; font-weight: 500;
   }
 
-  /* ── Model KPIs ── */
-  .kpi-strip {
-    display: flex; justify-content: center; gap: 24px; flex-wrap: wrap;
-    padding: 0 20px 60px;
-  }
-  .kpi {
-    background: var(--card); border: 1px solid var(--border);
-    border-radius: var(--radius); padding: 20px 28px; text-align: center;
-    min-width: 140px; transition: transform 0.2s, box-shadow 0.2s;
-  }
-  .kpi:hover { transform: translateY(-3px); box-shadow: var(--glow); }
-  .kpi-val  { font-size: 28px; font-weight: 700; letter-spacing: -0.5px; }
-  .kpi-label{ font-size: 12px; color: var(--muted); margin-top: 4px; }
-  .kpi.green .kpi-val { color: var(--green); }
-  .kpi.blue  .kpi-val { color: var(--accent); }
-  .kpi.amber .kpi-val { color: var(--amber); }
+  /* ════════════════════════ LAYOUT ════════════════════════ */
+  .wrap { max-width: 1080px; margin: 0 auto; padding: 40px 24px 90px; }
+  .view { display: none; animation: fadeUp 0.45s ease; }
+  .view.active { display: block; }
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: none; } }
 
-  /* ── Main layout ── */
-  .container { max-width: 1200px; margin: 0 auto; padding: 0 20px 80px; }
-  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
-  @media (max-width: 768px) { .grid-2 { grid-template-columns: 1fr; } }
+  /* ════════════════════════ HOME ════════════════════════ */
+  .home-hero { text-align: center; padding: 48px 20px 20px; }
+  .home-hero h1 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(32px, 4.6vw, 48px); font-weight: 600;
+    color: var(--navy); line-height: 1.18; letter-spacing: -0.3px;
+  }
+  .home-hero .rule {
+    width: 64px; height: 3px; background: var(--gold);
+    margin: 24px auto; border-radius: 2px;
+  }
+  .home-hero p.lead {
+    max-width: 720px; margin: 0 auto; font-size: 16.5px; line-height: 1.75; color: var(--muted);
+  }
+  .home-hero p.lead b { color: var(--text); font-weight: 600; }
 
-  /* ── Cards ── */
-  .card {
-    background: var(--card); border: 1px solid var(--border);
-    border-radius: var(--radius); padding: 28px;
+  .feature-row {
+    display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px;
+    margin: 48px 0 44px;
   }
-  .card-header { display: flex; align-items: center; gap: 10px; margin-bottom: 22px; }
-  .card-icon {
-    width: 36px; height: 36px; border-radius: 8px; display: flex;
-    align-items: center; justify-content: center; font-size: 18px;
-    background: rgba(79,124,255,0.12);
+  @media (max-width: 860px) { .feature-row { grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width: 520px) { .feature-row { grid-template-columns: 1fr; } }
+  .feature {
+    background: var(--card); border: 1px solid var(--border); border-radius: var(--radius);
+    padding: 26px 22px; box-shadow: var(--shadow);
   }
-  .card-title { font-size: 15px; font-weight: 600; }
-  .card-sub   { font-size: 12px; color: var(--muted); }
+  .feature .f-num {
+    font-family: 'Cormorant Garamond', serif; font-size: 15px; font-weight: 700;
+    color: var(--gold); letter-spacing: 2px; margin-bottom: 12px;
+  }
+  .feature h3 { font-size: 15px; font-weight: 600; color: var(--navy); margin-bottom: 8px; }
+  .feature p  { font-size: 13px; color: var(--muted); line-height: 1.65; }
 
-  /* ── Form ── */
-  .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
-  .form-group { display: flex; flex-direction: column; gap: 6px; }
-  .form-group label { font-size: 12px; color: var(--muted); font-weight: 500; }
-  .form-group input, .form-group select {
-    background: var(--surface); border: 1px solid var(--border);
-    border-radius: 8px; padding: 10px 12px; color: var(--text);
-    font-size: 13px; font-family: inherit;
-    transition: border-color 0.2s, box-shadow 0.2s;
-    outline: none;
+  .cta-center { text-align: center; }
+  .btn-primary {
+    display: inline-flex; align-items: center; gap: 10px;
+    background: var(--navy); color: #fff; border: none; cursor: pointer;
+    font-family: 'Inter', sans-serif; font-size: 15px; font-weight: 600;
+    padding: 16px 42px; border-radius: 10px; letter-spacing: 0.3px;
+    transition: background 0.2s, transform 0.15s, box-shadow 0.2s;
+    box-shadow: 0 4px 14px rgba(14,42,71,0.25);
   }
-  .form-group input:focus, .form-group select:focus {
-    border-color: var(--accent); box-shadow: 0 0 0 3px rgba(79,124,255,0.12);
-  }
-  .form-group input::placeholder { color: var(--muted); }
-  .form-group select option { background: var(--surface); }
-  .form-full { grid-column: 1 / -1; }
+  .btn-primary:hover { background: var(--navy-deep); transform: translateY(-1px); }
+  .btn-primary .arr { color: var(--gold-soft); }
+  .home-note { text-align: center; margin-top: 18px; font-size: 12px; color: var(--muted); }
 
-  /* ── Submit button ── */
-  .btn-submit {
-    width: 100%; margin-top: 18px; padding: 14px;
-    background: linear-gradient(135deg, var(--accent), var(--accent2));
-    border: none; border-radius: 10px; color: #fff;
-    font-size: 15px; font-weight: 600; cursor: pointer; font-family: inherit;
-    transition: opacity 0.2s, transform 0.15s;
-    display: flex; align-items: center; justify-content: center; gap: 8px;
+  /* ════════════════════════ FORM ════════════════════════ */
+  .page-head { margin-bottom: 28px; }
+  .page-head h2 {
+    font-family: 'Cormorant Garamond', serif; font-size: 30px; font-weight: 600; color: var(--navy);
   }
-  .btn-submit:hover:not(:disabled) { opacity: 0.9; transform: translateY(-1px); }
-  .btn-submit:disabled { opacity: 0.5; cursor: not-allowed; }
+  .page-head p { font-size: 13.5px; color: var(--muted); margin-top: 6px; line-height: 1.6; }
+  .back-link {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-size: 13px; color: var(--muted); text-decoration: none; cursor: pointer;
+    margin-bottom: 18px; background: none; border: none; font-family: inherit;
+  }
+  .back-link:hover { color: var(--navy); }
 
-  /* ── Pipeline Trace ── */
-  .trace-steps {
-    display: flex; flex-direction: column; gap: 0;
+  .form-card {
+    background: var(--card); border: 1px solid var(--border); border-radius: var(--radius);
+    box-shadow: var(--shadow); padding: 36px;
   }
-  .trace-step {
-    display: flex; align-items: flex-start; gap: 14px;
-    padding: 12px 0; border-bottom: 1px solid var(--border);
-    opacity: 0.35; transition: opacity 0.4s;
-  }
-  .trace-step:last-child { border-bottom: none; }
-  .trace-step.done  { opacity: 1; }
-  .trace-step.active { opacity: 1; }
-  .step-dot {
-    width: 28px; height: 28px; border-radius: 50%; flex-shrink: 0;
-    background: var(--surface); border: 2px solid var(--border);
-    display: flex; align-items: center; justify-content: center;
-    font-size: 12px; transition: all 0.3s;
-  }
-  .trace-step.done  .step-dot { background: var(--green); border-color: var(--green); }
-  .trace-step.active .step-dot { border-color: var(--accent); box-shadow: 0 0 8px var(--accent); animation: pulse 1s infinite; }
-  .trace-step.error .step-dot { background: var(--red); border-color: var(--red); opacity: 1; }
-  @keyframes pulse { 0%,100%{box-shadow:0 0 6px var(--accent)} 50%{box-shadow:0 0 16px var(--accent)} }
-  .step-info { flex: 1; }
-  .step-name { font-size: 13px; font-weight: 500; }
-  .step-detail { font-size: 11px; color: var(--muted); margin-top: 2px; font-family: 'JetBrains Mono', monospace; }
-
-  /* ── Decision Banner ── */
-  .decision-banner {
-    border-radius: 12px; padding: 24px 28px; margin-bottom: 24px;
-    display: none; animation: slideIn 0.4s ease;
-  }
-  @keyframes slideIn { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:none} }
-  .decision-banner.APPROVE { background: rgba(34,211,160,0.08); border: 1px solid rgba(34,211,160,0.25); }
-  .decision-banner.DECLINE { background: rgba(255,79,106,0.08); border: 1px solid rgba(255,79,106,0.25); }
-  .decision-banner.REFER   { background: rgba(245,166,35,0.08);  border: 1px solid rgba(245,166,35,0.25); }
-  .decision-rec {
-    font-size: 28px; font-weight: 800; letter-spacing: -0.5px;
+  .fieldset { margin-bottom: 32px; }
+  .fieldset:last-of-type { margin-bottom: 8px; }
+  .fieldset-title {
     display: flex; align-items: center; gap: 12px;
+    font-size: 12px; font-weight: 700; letter-spacing: 1.6px; text-transform: uppercase;
+    color: var(--navy); margin-bottom: 18px;
   }
-  .decision-banner.APPROVE .decision-rec { color: var(--green); }
-  .decision-banner.DECLINE .decision-rec { color: var(--red); }
-  .decision-banner.REFER   .decision-rec { color: var(--amber); }
-  .decision-meta { font-size: 12px; color: var(--muted); margin-top: 6px; font-family: 'JetBrains Mono', monospace; }
-
-  /* ── Reasons list ── */
-  .reasons-list { list-style: none; display: flex; flex-direction: column; gap: 10px; margin-top: 16px; }
-  .reasons-list li {
-    background: var(--surface); border: 1px solid var(--border);
-    border-radius: 8px; padding: 12px 14px; font-size: 13px; line-height: 1.5;
-    position: relative; padding-left: 34px;
+  .fieldset-title::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+  .form-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
+  @media (max-width: 760px) { .form-grid { grid-template-columns: 1fr 1fr; } }
+  @media (max-width: 520px) { .form-grid { grid-template-columns: 1fr; } }
+  .fg { display: flex; flex-direction: column; gap: 7px; }
+  .fg label { font-size: 12.5px; font-weight: 500; color: var(--text); }
+  .fg .hint { font-size: 11px; color: var(--muted); font-weight: 400; }
+  .fg input, .fg select {
+    background: #fbfcfd; border: 1px solid var(--border); border-radius: 8px;
+    padding: 11px 13px; font-size: 14px; color: var(--text); font-family: inherit;
+    outline: none; transition: border-color 0.2s, box-shadow 0.2s; width: 100%;
   }
-  .reasons-list li::before {
-    content: attr(data-n); position: absolute; left: 12px; top: 12px;
-    width: 18px; height: 18px; border-radius: 50%;
-    background: rgba(79,124,255,0.2); color: var(--accent);
-    font-size: 10px; font-weight: 700; display: flex; align-items: center; justify-content: center;
+  .fg input:focus, .fg select:focus {
+    border-color: var(--navy); box-shadow: 0 0 0 3px rgba(14,42,71,0.08); background: #fff;
   }
-  .cite { color: var(--accent); font-family: 'JetBrains Mono', monospace; font-size: 11px; }
-
-  /* ── Risk Gauge ── */
-  .risk-gauge { text-align: center; padding: 10px 0; }
-  .gauge-svg { width: 160px; height: 90px; }
-  .gauge-score { font-size: 26px; font-weight: 700; }
-  .gauge-band  { font-size: 12px; color: var(--muted); margin-top: 4px; }
-
-  /* ── SHAP bars ── */
-  .shap-bars { display: flex; flex-direction: column; gap: 10px; margin-top: 4px; }
-  .shap-row { display: flex; align-items: center; gap: 10px; }
-  .shap-name { font-size: 11px; font-family: 'JetBrains Mono', monospace; color: var(--muted); width: 160px; flex-shrink: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .shap-bar-bg { flex: 1; height: 6px; background: var(--border); border-radius: 3px; overflow: hidden; }
-  .shap-bar { height: 100%; border-radius: 3px; transition: width 0.6s ease; }
-  .shap-val  { font-size: 10px; font-family: 'JetBrains Mono', monospace; color: var(--muted); width: 40px; text-align: right; }
-
-  /* ── Metrics strip ── */
-  .meta-row { display: flex; gap: 16px; flex-wrap: wrap; margin-top: 16px; }
-  .meta-chip {
-    background: var(--surface); border: 1px solid var(--border);
-    border-radius: 20px; padding: 5px 12px; font-size: 11px;
-    font-family: 'JetBrains Mono', monospace;
-    display: flex; gap: 6px; align-items: center;
+  .auto-note {
+    background: var(--amber-bg); border: 1px solid #eddfb8; border-radius: 10px;
+    padding: 13px 16px; font-size: 12.5px; color: #7a5c14; line-height: 1.6; margin-bottom: 28px;
   }
-  .meta-chip .label { color: var(--muted); }
-  .meta-chip .val   { color: var(--text); font-weight: 600; }
-
-  /* ── Error state ── */
+  .auto-note b { font-weight: 600; }
+  .btn-submit {
+    width: 100%; margin-top: 26px; padding: 16px;
+    background: var(--navy); border: none; border-radius: 10px; color: #fff;
+    font-size: 15px; font-weight: 600; cursor: pointer; font-family: inherit;
+    letter-spacing: 0.3px; transition: background 0.2s;
+  }
+  .btn-submit:hover:not(:disabled) { background: var(--navy-deep); }
+  .btn-submit:disabled { opacity: 0.55; cursor: not-allowed; }
   .err-box {
-    background: rgba(255,79,106,0.06); border: 1px solid rgba(255,79,106,0.2);
-    border-radius: 8px; padding: 14px 16px; font-size: 13px; color: var(--red);
-    display: none; margin-top: 16px;
+    background: var(--red-bg); border: 1px solid #f2c9c4; border-radius: 8px;
+    padding: 13px 16px; font-size: 13px; color: var(--red);
+    display: none; margin-top: 16px; line-height: 1.55;
   }
 
-  /* ── Pipeline status placeholder ── */
-  .pipeline-idle {
-    text-align: center; padding: 40px 20px; color: var(--muted); font-size: 13px;
+  /* ════════════════════════ PROCESSING ════════════════════════ */
+  .proc-card {
+    background: var(--navy-deep); border-radius: var(--radius);
+    box-shadow: var(--shadow); padding: 34px 38px;
+    font-family: 'JetBrains Mono', monospace; color: #cdd8e4;
+    max-width: 720px; margin: 0 auto;
+  }
+  .proc-title {
+    color: #fff; font-size: 14px; font-weight: 600; padding-bottom: 14px;
+    border-bottom: 1px solid rgba(255,255,255,0.12); margin-bottom: 18px;
+  }
+  .proc-title .dim { color: rgba(255,255,255,0.45); font-weight: 400; }
+  .proc-step {
+    display: flex; align-items: center; gap: 12px;
+    padding: 9px 0; font-size: 13px; opacity: 0.28; transition: opacity 0.4s;
+  }
+  .proc-step.active, .proc-step.done { opacity: 1; }
+  .proc-step .mark { width: 20px; text-align: center; flex-shrink: 0; }
+  .proc-step.active .mark { color: var(--gold-soft); animation: blink 1s infinite; }
+  .proc-step.done   .mark { color: #4ade80; }
+  .proc-step.error  .mark { color: #f87171; }
+  @keyframes blink { 0%,100% { opacity: 1; } 50% { opacity: 0.3; } }
+  .proc-step .lbl { flex: 1; }
+  .proc-step .sub { color: rgba(255,255,255,0.35); font-size: 11px; }
+  .proc-gate {
+    margin-top: 16px; padding-top: 14px; border-top: 1px solid rgba(255,255,255,0.12);
+    font-size: 12px; color: rgba(255,255,255,0.5); display: none;
+  }
+  .proc-gate.show { display: block; color: #4ade80; }
+
+  /* ════════════════════════ REPORT ════════════════════════ */
+  .report { max-width: 900px; margin: 0 auto; }
+  .report-actions {
+    display: flex; justify-content: space-between; align-items: center; margin-bottom: 22px;
+    gap: 12px; flex-wrap: wrap;
+  }
+  .btn-ghost {
+    background: var(--card); border: 1px solid var(--border); border-radius: 8px;
+    padding: 10px 18px; font-size: 13px; font-weight: 500; color: var(--text);
+    cursor: pointer; font-family: inherit; transition: border-color 0.2s;
+  }
+  .btn-ghost:hover { border-color: var(--navy); }
+
+  .verdict {
+    border-radius: var(--radius); padding: 30px 34px; margin-bottom: 22px;
+    box-shadow: var(--shadow); border: 1px solid var(--border); background: var(--card);
+    border-left: 6px solid var(--muted);
+  }
+  .verdict.APPROVE   { border-left-color: var(--green); }
+  .verdict.DECLINE   { border-left-color: var(--red); }
+  .verdict.REFER     { border-left-color: var(--amber); }
+  .verdict.ESCALATED { border-left-color: var(--amber); }
+  .verdict-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 18px; flex-wrap: wrap; }
+  .verdict-rec {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 40px; font-weight: 700; letter-spacing: 2px; line-height: 1;
+  }
+  .verdict.APPROVE   .verdict-rec { color: var(--green); }
+  .verdict.DECLINE   .verdict-rec { color: var(--red); }
+  .verdict.REFER     .verdict-rec { color: var(--amber); }
+  .verdict.ESCALATED .verdict-rec { color: var(--amber); }
+  .verdict-name { font-size: 14px; color: var(--muted); margin-top: 8px; }
+  .verdict-name b { color: var(--text); font-weight: 600; }
+  .verdict-ids {
+    text-align: right; font-family: 'JetBrains Mono', monospace; font-size: 11.5px;
+    color: var(--muted); line-height: 2;
+  }
+  .verdict-ids b { color: var(--text); font-weight: 500; }
+  @media (max-width: 620px) { .verdict-ids { text-align: left; } }
+
+  .rsec {
+    background: var(--card); border: 1px solid var(--border); border-radius: var(--radius);
+    box-shadow: var(--shadow); margin-bottom: 22px; overflow: hidden;
+  }
+  .rsec-head {
+    padding: 15px 26px; border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; gap: 10px; background: #fbfcfd;
+  }
+  .rsec-head .tick { width: 8px; height: 8px; border-radius: 2px; background: var(--gold); }
+  .rsec-head h3 {
+    font-size: 12px; font-weight: 700; letter-spacing: 1.6px;
+    text-transform: uppercase; color: var(--navy);
+  }
+  .rsec-body { padding: 24px 26px; }
+
+  /* key-value grid */
+  .kv-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0 44px; }
+  @media (max-width: 640px) { .kv-grid { grid-template-columns: 1fr; } }
+  .kv {
+    display: flex; justify-content: space-between; align-items: baseline; gap: 14px;
+    padding: 9px 0; border-bottom: 1px dashed var(--border); font-size: 13.5px;
+  }
+  .kv .k { color: var(--muted); }
+  .kv .v { font-family: 'JetBrains Mono', monospace; font-weight: 500; text-align: right; font-size: 13px; }
+  .kv .v .dim { color: var(--muted); font-weight: 400; font-size: 11.5px; }
+  .badge {
+    display: inline-block; padding: 2px 10px; border-radius: 20px;
+    font-size: 11px; font-weight: 600; font-family: 'Inter', sans-serif;
+  }
+  .badge.ok   { background: var(--green-bg); color: var(--green); }
+  .badge.warn { background: var(--amber-bg); color: var(--amber); }
+  .badge.bad  { background: var(--red-bg);   color: var(--red); }
+
+  /* SHAP table */
+  .shap-table { width: 100%; border-collapse: collapse; }
+  .shap-table th {
+    text-align: left; font-size: 11px; font-weight: 600; letter-spacing: 1px;
+    text-transform: uppercase; color: var(--muted); padding: 0 10px 12px 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .shap-table th:last-child { width: 42%; }
+  .shap-table td {
+    padding: 11px 10px 11px 0; font-size: 13px; border-bottom: 1px dashed var(--border);
+    font-family: 'JetBrains Mono', monospace;
+  }
+  .shap-table tr:last-child td { border-bottom: none; }
+  .shap-bar-bg { height: 8px; background: #eef1f5; border-radius: 4px; overflow: hidden; }
+  .shap-bar { height: 100%; border-radius: 4px; transition: width 0.7s ease; }
+  .shap-bar.up   { background: var(--red); }
+  .shap-bar.down { background: var(--green); }
+  .shap-legend { display: flex; gap: 20px; margin-top: 16px; font-size: 11.5px; color: var(--muted); }
+  .shap-legend .sw { display: inline-block; width: 10px; height: 10px; border-radius: 3px; margin-right: 6px; vertical-align: -1px; }
+
+  /* Reasons */
+  .reason {
+    display: flex; gap: 14px; padding: 13px 0; border-bottom: 1px dashed var(--border);
+    font-size: 14px; line-height: 1.7;
+  }
+  .reason:last-child { border-bottom: none; }
+  .reason .n {
+    width: 24px; height: 24px; flex-shrink: 0; border-radius: 50%;
+    background: var(--navy); color: #fff; font-size: 11.5px; font-weight: 600;
+    display: flex; align-items: center; justify-content: center; margin-top: 2px;
+  }
+  .cite { color: var(--gold); font-family: 'JetBrains Mono', monospace; font-size: 12px; }
+  .conditions-block { margin-top: 18px; }
+  .conditions-block h4 {
+    font-size: 11px; font-weight: 700; letter-spacing: 1.4px; text-transform: uppercase;
+    color: var(--muted); margin-bottom: 10px;
+  }
+  .cond { font-size: 13.5px; padding: 8px 0 8px 20px; position: relative; color: var(--text); }
+  .cond::before { content: '›'; position: absolute; left: 4px; color: var(--gold); font-weight: 700; }
+
+  /* Evaluation */
+  .eval-bar-row { display: flex; align-items: center; gap: 14px; padding: 9px 0; border-bottom: 1px dashed var(--border); font-size: 13.5px; }
+  .eval-bar-row .k { color: var(--muted); width: 110px; flex-shrink: 0; }
+  .eval-bar-bg { flex: 1; height: 9px; background: #eef1f5; border-radius: 5px; overflow: hidden; }
+  .eval-bar { height: 100%; border-radius: 5px; background: var(--green); transition: width 0.7s ease; }
+  .eval-bar.low { background: var(--red); }
+  .eval-bar-row .v { font-family: 'JetBrains Mono', monospace; font-size: 13px; font-weight: 600; width: 52px; text-align: right; }
+
+  /* Trace table */
+  .trace-table { width: 100%; border-collapse: collapse; }
+  .trace-table th {
+    text-align: left; font-size: 11px; font-weight: 600; letter-spacing: 1px;
+    text-transform: uppercase; color: var(--muted); padding: 0 12px 12px 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .trace-table td {
+    padding: 10px 12px 10px 0; font-size: 12px; border-bottom: 1px dashed var(--border);
+    font-family: 'JetBrains Mono', monospace; color: var(--text); vertical-align: top;
+  }
+  .trace-table tr:last-child td { border-bottom: none; }
+  .trace-table .agent-cell { font-weight: 500; white-space: nowrap; }
+  .trace-table .time-cell { color: var(--muted); white-space: nowrap; font-size: 11px; }
+
+  .report-footer {
+    text-align: center; font-size: 11.5px; color: var(--muted); margin-top: 8px;
+    font-family: 'JetBrains Mono', monospace; line-height: 2;
   }
 
-  /* ── Scrollbar ── */
-  ::-webkit-scrollbar { width: 6px; }
-  ::-webkit-scrollbar-track { background: var(--bg); }
-  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+  footer.site {
+    text-align: center; padding: 26px; font-size: 11.5px; color: var(--muted);
+    border-top: 1px solid var(--border); background: var(--card);
+  }
+
+  ::-webkit-scrollbar { width: 8px; height: 8px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: #cfd6df; border-radius: 4px; }
+
+  @media print {
+    header, .report-actions, footer.site { display: none !important; }
+    body { background: #fff; }
+    .rsec, .verdict { box-shadow: none; }
+  }
 </style>
 </head>
 <body>
 
-<!-- Navbar -->
-<nav>
-  <div class="logo">
-    <div class="logo-icon">💎</div>
-    <div>
-      <div class="logo-text">Halcyon Credit</div>
-      <div class="logo-sub">Agentic Underwriting Copilot</div>
+<!-- ════════════════════════ HEADER ════════════════════════ -->
+<header>
+  <div class="brand">
+    <!-- Halcyon Credit mark: shield with pillar-H and kingfisher wing arc -->
+    <svg class="brand-logo" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="Halcyon Credit logo">
+      <defs>
+        <linearGradient id="hcGold" x1="0" y1="0" x2="64" y2="64">
+          <stop offset="0%" stop-color="#d9b968"/>
+          <stop offset="100%" stop-color="#b9912f"/>
+        </linearGradient>
+      </defs>
+      <path d="M32 3 L57 12 V32 C57 47 46 57.5 32 61 C18 57.5 7 47 7 32 V12 Z"
+            fill="none" stroke="url(#hcGold)" stroke-width="2.5"/>
+      <path d="M23 22 V46 M41 22 V46 M23 34 H41"
+            stroke="#ffffff" stroke-width="4" stroke-linecap="round"/>
+      <path d="M18 15 Q32 6 46 15" stroke="url(#hcGold)" stroke-width="3" stroke-linecap="round" fill="none"/>
+    </svg>
+    <div class="brand-text">
+      <div class="brand-name">Halcyon <span class="gold">Credit</span></div>
+      <div class="brand-tag">Agentic Underwriting Copilot</div>
     </div>
   </div>
-  <div class="nav-badge">Stage 4 · Team Jamun · IIT Gandhinagar</div>
-</nav>
+</header>
 
-<!-- Hero -->
-<div class="hero">
-  <div class="hero-tag">⚡ MULTI-AGENT · LANGGRAPH · GPT-4.1</div>
-  <h1>Underwriting Intelligence<br>at Machine Speed</h1>
-  <p>8-node LangGraph pipeline: income verification → credit analysis → policy compliance → ML risk scoring → LLM synthesis → faithfulness evaluation</p>
-</div>
+<div class="wrap">
 
-<!-- KPI Strip -->
-<div class="kpi-strip">
-  <div class="kpi blue">
-    <div class="kpi-val">0.7166</div>
-    <div class="kpi-label">ROC-AUC</div>
-  </div>
-  <div class="kpi green">
-    <div class="kpi-val">0.3854</div>
-    <div class="kpi-label">PR-AUC</div>
-  </div>
-  <div class="kpi blue">
-    <div class="kpi-val">41</div>
-    <div class="kpi-label">Model Features</div>
-  </div>
-  <div class="kpi amber">
-    <div class="kpi-val">1.3M</div>
-    <div class="kpi-label">Training Rows</div>
-  </div>
-  <div class="kpi green">
-    <div class="kpi-val">7</div>
-    <div class="kpi-label">Policy Rules</div>
-  </div>
-  <div class="kpi blue">
-    <div class="kpi-val">~2s</div>
-    <div class="kpi-label">LLM Latency</div>
-  </div>
-</div>
+  <!-- ════════════════════════ VIEW: HOME ════════════════════════ -->
+  <section class="view active" id="view-home">
+    <div class="home-hero">
+      <h1>Careful underwriting.<br>At machine speed.</h1>
+      <div class="rule"></div>
+      <p class="lead">
+        Halcyon Credit's underwriting copilot is a <b>multi-agent AI system</b> that reviews a
+        loan application the way a senior underwriter would — it independently
+        <b>verifies income</b>, <b>examines credit history</b>, and <b>applies lending policy</b>,
+        then scores repayment risk with a machine-learning model trained on
+        1.3&nbsp;million real loans. A language model drafts the final recommendation with
+        written, evidence-cited reasons, and an automated judge verifies that every claim
+        is grounded in the applicant's actual data before the decision is recorded to a
+        permanent audit trail. <b>No black boxes — every decision is explainable, defensible,
+        and fully traceable.</b>
+      </p>
+    </div>
 
-<!-- Main -->
-<div class="container">
-  <div class="grid-2">
-
-    <!-- LEFT: Application Form -->
-    <div class="card">
-      <div class="card-header">
-        <div class="card-icon">📋</div>
-        <div>
-          <div class="card-title">Loan Application</div>
-          <div class="card-sub">Submit for agentic underwriting decision</div>
-        </div>
+    <div class="feature-row">
+      <div class="feature">
+        <div class="f-num">01</div>
+        <h3>Verify</h3>
+        <p>Income and credit-bureau data are independently confirmed by dedicated verification agents before anything is decided.</p>
       </div>
+      <div class="feature">
+        <div class="f-num">02</div>
+        <h3>Assess</h3>
+        <p>A gradient-boosted risk model scores repayment probability, with feature-level attribution explaining what drove the score.</p>
+      </div>
+      <div class="feature">
+        <div class="f-num">03</div>
+        <h3>Comply</h3>
+        <p>Every application is checked against Halcyon's lending policy — hard-stop rules are enforced deterministically, never by the AI alone.</p>
+      </div>
+      <div class="feature">
+        <div class="f-num">04</div>
+        <h3>Audit</h3>
+        <p>Decisions ship with written reasons, a faithfulness evaluation, and a step-by-step trace a regulator could review.</p>
+      </div>
+    </div>
+
+    <div class="cta-center">
+      <button class="btn-primary" onclick="showView('form')">
+        Begin Loan Application <span class="arr">→</span>
+      </button>
+      <div class="home-note">Takes about a minute · Decision typically returned in under 10 seconds</div>
+    </div>
+  </section>
+
+  <!-- ════════════════════════ VIEW: APPLICATION FORM ════════════════════════ -->
+  <section class="view" id="view-form">
+    <button class="back-link" onclick="showView('home')">← Back to overview</button>
+    <div class="page-head">
+      <h2>Loan Application</h2>
+      <p>Complete the application below. Fields are reviewed by independent verification agents — please answer accurately.</p>
+    </div>
+
+    <div class="form-card">
+      <div class="auto-note">
+        <b>Handled automatically:</b> your Application ID is generated by the system, and income
+        verification status is determined by our verification agents — you don't need to provide either.
+      </div>
+
       <form id="appForm">
-        <div class="form-grid">
-          <div class="form-group">
-            <label>Applicant Name</label>
-            <input type="text" id="name" placeholder="e.g. Rohan Mehta" value="Rohan Mehta" required>
-          </div>
-          <div class="form-group">
-            <label>Applicant ID</label>
-            <input type="text" id="applicant_id" placeholder="APL-001" value="APL-LIVE-001" required>
-          </div>
-          <div class="form-group">
-            <label>Loan Amount (INR)</label>
-            <input type="number" id="loan_amount" placeholder="250000" value="250000" min="10000" required>
-          </div>
-          <div class="form-group">
-            <label>Annual Income (INR)</label>
-            <input type="number" id="annual_income" placeholder="900000" value="900000" required>
-          </div>
-          <div class="form-group">
-            <label>Loan Purpose</label>
-            <select id="loan_purpose">
-              <option value="home_improvement">Home Improvement</option>
-              <option value="debt_consolidation">Debt Consolidation</option>
-              <option value="car">Car</option>
-              <option value="medical">Medical</option>
-              <option value="business">Business</option>
-              <option value="education">Education</option>
-              <option value="other">Other</option>
-            </select>
-          </div>
-          <div class="form-group">
-            <label>Loan Term (months)</label>
-            <select id="loan_term_months">
-              <option value="36" selected>36 months</option>
-              <option value="60">60 months</option>
-            </select>
-          </div>
-          <div class="form-group">
-            <label>Employment Type</label>
-            <select id="employment_type">
-              <option value="salaried" selected>Salaried</option>
-              <option value="self_employed">Self Employed</option>
-              <option value="contractor">Contractor</option>
-              <option value="unemployed">Unemployed</option>
-            </select>
-          </div>
-          <div class="form-group">
-            <label>Months Employed</label>
-            <input type="number" id="months_employed" value="48" min="0" required>
-          </div>
-          <div class="form-group">
-            <label>Credit Score (FICO)</label>
-            <input type="number" id="credit_score" value="720" min="300" max="850" required>
-          </div>
-          <div class="form-group">
-            <label>Revolving Utilisation (%)</label>
-            <input type="number" id="revolving_utilisation" value="22" min="0" max="100" step="0.1">
-          </div>
-          <div class="form-group">
-            <label>Existing Monthly Debts (INR)</label>
-            <input type="number" id="existing_debts" value="5000" min="0">
-          </div>
-          <div class="form-group">
-            <label>Delinquencies (2yr)</label>
-            <input type="number" id="delinquencies_2yr" value="0" min="0">
-          </div>
-          <div class="form-group">
-            <label>Open Accounts</label>
-            <input type="number" id="open_accounts" value="8" min="0">
-          </div>
-          <div class="form-group">
-            <label>Credit Age (months)</label>
-            <input type="number" id="credit_age_months" value="84" min="0">
-          </div>
-          <div class="form-group">
-            <label>Public Records</label>
-            <input type="number" id="public_records" value="0" min="0">
-          </div>
-          <div class="form-group">
-            <label>Inquiries (6mo)</label>
-            <input type="number" id="inquiries_6mo" value="1" min="0">
-          </div>
-          <div class="form-group">
-            <label>Home Ownership</label>
-            <select id="home_ownership">
-              <option value="MORTGAGE" selected>Mortgage</option>
-              <option value="RENT">Rent</option>
-              <option value="OWN">Own</option>
-            </select>
-          </div>
-          <div class="form-group">
-            <label>Verification Status</label>
-            <select id="verification_status">
-              <option value="Source Verified" selected>Source Verified</option>
-              <option value="Verified">Verified</option>
-              <option value="Not Verified">Not Verified</option>
-            </select>
+        <div class="fieldset">
+          <div class="fieldset-title">Applicant &amp; Loan</div>
+          <div class="form-grid">
+            <div class="fg">
+              <label>Full Name</label>
+              <input type="text" id="name" placeholder="e.g. Priya Sharma" required>
+            </div>
+            <div class="fg">
+              <label>Loan Amount <span class="hint">($)</span></label>
+              <input type="number" id="loan_amount" placeholder="12000" min="1000" required>
+            </div>
+            <div class="fg">
+              <label>Loan Purpose</label>
+              <select id="loan_purpose">
+                <option value="home_improvement">Home Improvement</option>
+                <option value="debt_consolidation">Debt Consolidation</option>
+                <option value="car">Car</option>
+                <option value="medical">Medical</option>
+                <option value="other">Other</option>
+              </select>
+            </div>
+            <div class="fg">
+              <label>Loan Term</label>
+              <select id="loan_term_months">
+                <option value="36" selected>36 months</option>
+                <option value="60">60 months</option>
+              </select>
+            </div>
+            <div class="fg">
+              <label>Home Ownership</label>
+              <select id="home_ownership">
+                <option value="RENT">Rent</option>
+                <option value="MORTGAGE">Mortgage</option>
+                <option value="OWN">Own</option>
+              </select>
+            </div>
           </div>
         </div>
-        <button class="btn-submit" type="submit" id="submitBtn">
-          <span id="btnText">⚡ Submit for Underwriting</span>
-        </button>
+
+        <div class="fieldset">
+          <div class="fieldset-title">Income &amp; Employment</div>
+          <div class="form-grid">
+            <div class="fg">
+              <label>Annual Income <span class="hint">(gross, $)</span></label>
+              <input type="number" id="annual_income" placeholder="72000" min="1" required>
+            </div>
+            <div class="fg">
+              <label>Employment Type</label>
+              <select id="employment_type">
+                <option value="salaried" selected>Salaried</option>
+                <option value="self-employed">Self-Employed</option>
+                <option value="gig">Gig / Freelance</option>
+              </select>
+            </div>
+            <div class="fg">
+              <label>Months at Current Employer</label>
+              <input type="number" id="months_employed" placeholder="48" min="0" required>
+            </div>
+            <div class="fg">
+              <label>Existing Monthly Debt Payments <span class="hint">($)</span></label>
+              <input type="number" id="existing_debts" placeholder="800" min="0" required>
+            </div>
+          </div>
+        </div>
+
+        <div class="fieldset">
+          <div class="fieldset-title">Credit Profile</div>
+          <div class="form-grid">
+            <div class="fg">
+              <label>Credit Score <span class="hint">(FICO 300–850)</span></label>
+              <input type="number" id="credit_score" placeholder="720" min="300" max="850" required>
+            </div>
+            <div class="fg">
+              <label>Revolving Utilisation <span class="hint">(%)</span></label>
+              <input type="number" id="revolving_utilisation" placeholder="22" min="0" max="100" step="0.1" required>
+            </div>
+            <div class="fg">
+              <label>Delinquencies <span class="hint">(last 2 years)</span></label>
+              <input type="number" id="delinquencies_2yr" placeholder="0" min="0" required>
+            </div>
+            <div class="fg">
+              <label>Open Credit Accounts</label>
+              <input type="number" id="open_accounts" placeholder="8" min="0" required>
+            </div>
+            <div class="fg">
+              <label>Credit History Age <span class="hint">(months)</span></label>
+              <input type="number" id="credit_age_months" placeholder="96" min="0" required>
+            </div>
+            <div class="fg">
+              <label>Public Records <span class="hint">(bankruptcies, liens)</span></label>
+              <input type="number" id="public_records" placeholder="0" min="0" required>
+            </div>
+            <div class="fg">
+              <label>Credit Inquiries <span class="hint">(last 6 months)</span></label>
+              <input type="number" id="inquiries_6mo" placeholder="1" min="0" required>
+            </div>
+          </div>
+        </div>
+
+        <button class="btn-submit" type="submit" id="submitBtn">Submit for Underwriting Review</button>
         <div class="err-box" id="errBox"></div>
       </form>
     </div>
+  </section>
 
-    <!-- RIGHT: Pipeline + Results -->
-    <div style="display:flex;flex-direction:column;gap:24px;">
-
-      <!-- Pipeline Trace -->
-      <div class="card">
-        <div class="card-header">
-          <div class="card-icon">🔀</div>
-          <div>
-            <div class="card-title">Pipeline Trace</div>
-            <div class="card-sub">LangGraph node execution</div>
-          </div>
-        </div>
-        <div id="pipelineIdle" class="pipeline-idle">
-          Submit an application to see the pipeline execute in real-time
-        </div>
-        <div class="trace-steps" id="traceSteps" style="display:none"></div>
-      </div>
-
-      <!-- Decision Result -->
-      <div class="card" id="resultsCard" style="display:none">
-        <div class="card-header">
-          <div class="card-icon">🏛️</div>
-          <div>
-            <div class="card-title">Underwriting Decision</div>
-            <div class="card-sub">GPT-4.1 grounded synthesis</div>
-          </div>
-        </div>
-
-        <div class="decision-banner" id="decisionBanner">
-          <div class="decision-rec" id="decisionRec">—</div>
-          <div class="decision-meta" id="decisionMeta"></div>
-          <div class="meta-row" id="metaRow"></div>
-        </div>
-
-        <div style="margin-top:4px">
-          <div style="font-size:12px;color:var(--muted);font-weight:600;margin-bottom:10px;text-transform:uppercase;letter-spacing:0.5px">Grounded Reasons</div>
-          <ul class="reasons-list" id="reasonsList"></ul>
-        </div>
-
-        <!-- Risk Gauge + SHAP -->
-        <div class="grid-2" style="margin-top:20px;gap:16px">
-          <div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:16px;text-align:center">
-            <div style="font-size:11px;color:var(--muted);font-weight:600;margin-bottom:12px;text-transform:uppercase;letter-spacing:0.5px">Risk Score</div>
-            <div class="gauge-score" id="riskScore">—</div>
-            <div class="gauge-band" id="riskBand">—</div>
-          </div>
-          <div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:16px">
-            <div style="font-size:11px;color:var(--muted);font-weight:600;margin-bottom:12px;text-transform:uppercase;letter-spacing:0.5px">Top Features</div>
-            <div class="shap-bars" id="shapBars"></div>
-          </div>
-        </div>
-      </div>
+  <!-- ════════════════════════ VIEW: PROCESSING ════════════════════════ -->
+  <section class="view" id="view-processing">
+    <div class="proc-card">
+      <div class="proc-title"><span class="dim">Processing:</span> <span id="procName">—</span></div>
+      <div id="procSteps"></div>
+      <div class="proc-gate" id="procGate"></div>
     </div>
-  </div>
+  </section>
+
+  <!-- ════════════════════════ VIEW: REPORT ════════════════════════ -->
+  <section class="view" id="view-report">
+    <div class="report">
+      <div class="report-actions">
+        <button class="btn-ghost" onclick="resetToForm()">← New Application</button>
+        <button class="btn-ghost" onclick="window.print()">Print / Save Report</button>
+      </div>
+
+      <!-- Verdict banner -->
+      <div class="verdict" id="verdictBanner">
+        <div class="verdict-top">
+          <div>
+            <div class="verdict-rec" id="vRec">—</div>
+            <div class="verdict-name">Applicant: <b id="vName">—</b></div>
+          </div>
+          <div class="verdict-ids">
+            Audit ID &nbsp;<b id="vAudit">—</b><br>
+            App ID &nbsp;&nbsp;&nbsp;<b id="vApp">—</b><br>
+            Issued &nbsp;&nbsp;&nbsp;<b id="vIssued">—</b>
+          </div>
+        </div>
+      </div>
+
+      <!-- Applicant Profile -->
+      <div class="rsec">
+        <div class="rsec-head"><span class="tick"></span><h3>Applicant Profile</h3></div>
+        <div class="rsec-body"><div class="kv-grid" id="profileGrid"></div></div>
+      </div>
+
+      <!-- Risk Model Output -->
+      <div class="rsec">
+        <div class="rsec-head"><span class="tick"></span><h3>Risk Model Output</h3></div>
+        <div class="rsec-body"><div class="kv-grid" id="riskGrid"></div></div>
+      </div>
+
+      <!-- Feature Attribution -->
+      <div class="rsec">
+        <div class="rsec-head"><span class="tick"></span><h3>Feature Attribution — Top Risk Drivers (SHAP)</h3></div>
+        <div class="rsec-body">
+          <table class="shap-table">
+            <thead><tr><th>Feature</th><th>Value</th><th>Impact</th><th></th></tr></thead>
+            <tbody id="shapBody"></tbody>
+          </table>
+          <div class="shap-legend">
+            <span><span class="sw" style="background:var(--red)"></span>Increases risk</span>
+            <span><span class="sw" style="background:var(--green)"></span>Decreases risk</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Decision Reasons -->
+      <div class="rsec">
+        <div class="rsec-head"><span class="tick"></span><h3>Decision Reasons (Auditable)</h3></div>
+        <div class="rsec-body">
+          <div id="reasonsList"></div>
+          <div class="conditions-block" id="condBlock" style="display:none">
+            <h4>Conditions of Approval</h4>
+            <div id="condList"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Evaluation -->
+      <div class="rsec">
+        <div class="rsec-head"><span class="tick"></span><h3>Evaluation — Faithfulness Gate</h3></div>
+        <div class="rsec-body">
+          <div class="eval-bar-row">
+            <span class="k">Faithfulness</span>
+            <div class="eval-bar-bg"><div class="eval-bar" id="faithBar" style="width:0%"></div></div>
+            <span class="v" id="faithVal">—</span>
+          </div>
+          <div class="eval-bar-row">
+            <span class="k">Relevancy</span>
+            <div class="eval-bar-bg"><div class="eval-bar" id="relevBar" style="width:0%"></div></div>
+            <span class="v" id="relevVal">—</span>
+          </div>
+          <div class="kv-grid" style="margin-top:12px" id="evalGrid"></div>
+        </div>
+      </div>
+
+      <!-- Full Audit Trace -->
+      <div class="rsec">
+        <div class="rsec-head"><span class="tick"></span><h3>Full Audit Trace</h3></div>
+        <div class="rsec-body" style="overflow-x:auto">
+          <table class="trace-table">
+            <thead><tr><th>#</th><th>Agent</th><th>Action</th><th>Time</th></tr></thead>
+            <tbody id="traceBody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="report-footer" id="reportFooter"></div>
+    </div>
+  </section>
 </div>
+
+<footer class="site">
+  Halcyon Credit · Agentic Underwriting Copilot · Every decision is recorded to a permanent audit trail.
+</footer>
 
 <script>
 const API = 'http://localhost:8000';
 
-const STEPS = [
-  { key: 'init',        label: 'Init State',            icon: '🔧', detail: 'Building ApplicationState' },
-  { key: 'income',      label: 'Income Verification',   icon: '💰', detail: 'Verifying income from bureau...' },
-  { key: 'credit',      label: 'Credit Bureau Pull',    icon: '📊', detail: 'Fetching credit history...' },
-  { key: 'policy',      label: 'Policy Compliance',     icon: '📜', detail: 'Checking 7 Halcyon policies...' },
-  { key: 'risk',        label: 'Risk Scoring (ML)',      icon: '🤖', detail: 'LightGBM · 41 features · LC V2' },
-  { key: 'synthesize',  label: 'Decision Synthesis',    icon: '🧠', detail: 'GPT-4.1 via OpenRouter...' },
-  { key: 'evaluate',    label: 'Faithfulness Evaluation',icon: '⚖️', detail: 'LLM-as-Judge · threshold 0.75' },
-  { key: 'record',      label: 'Record Persistence',    icon: '💾', detail: 'Writing to SQLite audit trail...' },
-];
+/* ─────────────────────────── View switching ─────────────────────────── */
+function showView(name) {
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.getElementById(`view-${name}`).classList.add('active');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+function resetToForm() {
+  document.getElementById('errBox').style.display = 'none';
+  showView('form');
+}
 
-function buildTrace() {
-  const container = document.getElementById('traceSteps');
-  container.innerHTML = '';
-  STEPS.forEach((s, i) => {
-    const div = document.createElement('div');
-    div.className = 'trace-step';
-    div.id = `step-${s.key}`;
-    div.innerHTML = `
-      <div class="step-dot" id="dot-${s.key}">${s.icon}</div>
-      <div class="step-info">
-        <div class="step-name">${s.label}</div>
-        <div class="step-detail" id="detail-${s.key}">${s.detail}</div>
-      </div>`;
-    container.appendChild(div);
+/* ─────────────────────────── Formatting helpers ─────────────────────── */
+const fmtMoney = n => (n == null) ? '—' :
+  '$' + Number(n).toLocaleString('en-US', { maximumFractionDigits: 0 });
+const fmtPct   = n => (n == null) ? '—' : `${Number(n).toFixed(1)}%`;
+const esc = s => String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+
+/* ─────────────────────────── Processing animation ────────────────────── */
+const PROC_STEPS = [
+  { key: 'income',     label: '[1/3] Income Verification Agent',  sub: 'confirming stated income against records' },
+  { key: 'credit',     label: '[2/3] Credit History Agent',       sub: 'pulling bureau file' },
+  { key: 'policy',     label: '[3/3] Policy Compliance Agent',    sub: 'applying Halcyon lending policy' },
+  { key: 'risk',       label: 'Risk Scoring Agent (LightGBM)',    sub: 'scoring repayment risk · 41 features' },
+  { key: 'synthesize', label: 'Decision Synthesizer',             sub: 'drafting evidence-cited recommendation' },
+  { key: 'evaluate',   label: 'Evaluation Agent (Judge)',         sub: 'verifying every claim against source data' },
+  { key: 'record',     label: 'Decision Record Writer',           sub: 'persisting immutable audit record' },
+];
+let procTimers = [];
+
+function buildProcView(name) {
+  document.getElementById('procName').textContent = name;
+  const box = document.getElementById('procSteps');
+  box.innerHTML = PROC_STEPS.map(s => `
+    <div class="proc-step" id="ps-${s.key}">
+      <span class="mark" id="pm-${s.key}">→</span>
+      <span class="lbl">${s.label} <span class="sub">· ${s.sub}</span></span>
+    </div>`).join('');
+  const gate = document.getElementById('procGate');
+  gate.className = 'proc-gate';
+  gate.textContent = '';
+}
+function setProcStep(key, status) {
+  const el = document.getElementById(`ps-${key}`);
+  const mk = document.getElementById(`pm-${key}`);
+  if (!el) return;
+  el.className = `proc-step ${status}`;
+  mk.textContent = status === 'done' ? '✓' : status === 'error' ? '✗' : '→';
+}
+function animateProc() {
+  const delays = [300, 1100, 1900, 2900, 4200, 6500, 8800];
+  PROC_STEPS.forEach((s, i) => {
+    procTimers.push(setTimeout(() => {
+      setProcStep(s.key, 'active');
+      if (i > 0) setProcStep(PROC_STEPS[i-1].key, 'done');
+    }, delays[i]));
   });
 }
-
-async function setStep(key, status, detail) {
-  const el   = document.getElementById(`step-${key}`);
-  const dot  = document.getElementById(`dot-${key}`);
-  const det  = document.getElementById(`detail-${key}`);
-  if (!el) return;
-  el.className = `trace-step ${status}`;
-  if (detail) det.textContent = detail;
+function finishProc(data) {
+  procTimers.forEach(clearTimeout);
+  procTimers = [];
+  PROC_STEPS.forEach(s => setProcStep(s.key, 'done'));
+  const gate = document.getElementById('procGate');
+  const f = data.faithfulness_score ?? 0;
+  gate.className = 'proc-gate show';
+  gate.textContent = data.eval_pass
+    ? `✓ Faithfulness gate passed (${f.toFixed(3)})`
+    : `⚠ Faithfulness gate: ${f.toFixed(3)} — routed per policy`;
+}
+function failProc() {
+  procTimers.forEach(clearTimeout);
+  procTimers = [];
+  PROC_STEPS.forEach(s => setProcStep(s.key, 'error'));
 }
 
-function renderDecision(data) {
-  const banner = document.getElementById('decisionBanner');
-  const rec    = document.getElementById('decisionRec');
-  const meta   = document.getElementById('decisionMeta');
-  const metaRow= document.getElementById('metaRow');
+/* ─────────────────────────── Report rendering ────────────────────────── */
+function kvRow(k, vHtml) {
+  return `<div class="kv"><span class="k">${k}</span><span class="v">${vHtml}</span></div>`;
+}
 
-  const icons  = { APPROVE: '✅', DECLINE: '❌', REFER: '⚠️' };
-  banner.className = `decision-banner ${data.recommendation}`;
-  banner.style.display = 'block';
-  rec.textContent = `${icons[data.recommendation] || ''} ${data.recommendation}`;
+/* Human-readable names for model features (SHAP attribution table) */
+const FEATURE_LABELS = {
+  sub_grade_encoded:     'Credit Grade (detailed)',
+  grade_encoded:         'Credit Grade',
+  dti:                   'Debt-to-Income Ratio',
+  revol_util:            'Credit Card Utilisation',
+  revol_bal_to_income:   'Card Balances vs Income',
+  loan_to_income:        'Loan Size vs Income',
+  installment_to_income: 'Monthly Payment vs Income',
+  delinq_2yrs:           'Late Payments (last 2 yrs)',
+  pct_tl_nvr_dlq:        '% of Accounts Never Late',
+  num_tl_90g_dpd_24m:    'Accounts 90+ Days Late (2 yrs)',
+  num_tl_30dpd:          'Accounts Currently 30+ Days Late',
+  num_actv_rev_tl:       'Active Credit Cards / Lines',
+  has_public_record:     'Has Public Record',
+  pub_rec:               'Public Records',
+  pub_rec_bankruptcies:  'Bankruptcies on Record',
+  credit_age_months:     'Length of Credit History',
+  open_acc:              'Open Credit Accounts',
+  total_acc:             'Total Credit Accounts (lifetime)',
+  mort_acc:              'Mortgage Accounts',
+  num_bc_tl:             'Bank Card Accounts',
+  num_il_tl:             'Instalment Loan Accounts',
+  acc_open_past_24mths:  'New Accounts Opened (2 yrs)',
+  tot_cur_bal:           'Total Outstanding Balance',
+  tot_hi_cred_lim:       'Total Credit Limit',
+  avg_cur_bal:           'Average Account Balance',
+  bc_util:               'Bank Card Utilisation',
+  il_util:               'Instalment Loan Utilisation',
+  all_util:              'Overall Credit Utilisation',
+  total_rev_hi_lim:      'Revolving Credit Limit',
+  annual_inc:            'Annual Income (stated)',
+  loan_amnt:             'Loan Amount Requested',
+  int_rate:              'Estimated Interest Rate',
+  installment:           'Estimated Monthly Instalment',
+  term_months:           'Loan Term',
+  employment_months:     'Time with Current Employer',
+  income_confidence:     'Income Verification Confidence',
+  verified_income:       'Verified Income',
+  inq_last_6mths:        'Recent Credit Inquiries (6 mo)',
+  purpose_risk:          'Loan Purpose Risk Level',
+  home_own_encoded:      'Home Ownership Status',
+  thin_file:             'Thin Credit File',
+  /* legacy / MVP model names */
+  credit_score:          'Credit Score',
+  revolving_utilisation: 'Credit Card Utilisation',
+};
+const featureLabel = f => FEATURE_LABELS[f] ||
+  f.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
 
-  meta.textContent = `audit_id: ${data.audit_id}`;
+function renderReport(data) {
+  const p = data.applicant || {};
 
-  metaRow.innerHTML = [
-    { label: 'risk_score',   val: (data.risk_score || 0).toFixed(4) },
-    { label: 'faithfulness', val: (data.faithfulness || 0).toFixed(3) },
-    { label: 'cost',         val: `$${(data.cost_usd || 0).toFixed(5)}` },
-    { label: 'escalated',    val: data.escalated ? 'yes' : 'no' },
-  ].map(c => `<div class="meta-chip"><span class="label">${c.label}</span><span class="val">${c.val}</span></div>`).join('');
+  /* Verdict banner */
+  const banner = document.getElementById('verdictBanner');
+  banner.className = `verdict ${data.recommendation}`;
+  document.getElementById('vRec').textContent    = data.recommendation;
+  document.getElementById('vName').textContent   = p.name || '—';
+  document.getElementById('vAudit').textContent  = data.audit_id;
+  document.getElementById('vApp').textContent    = data.application_id;
+  document.getElementById('vIssued').textContent = (data.created_at || '').replace('T', ' ').slice(0, 19);
 
-  // Reasons
-  const list = document.getElementById('reasonsList');
-  list.innerHTML = (data.reasons || []).map((r, i) => {
-    const cited = r.replace(/\[([^\]]+)\]/g, '<span class="cite">[$1]</span>');
-    return `<li data-n="${i+1}">${cited}</li>`;
-  }).join('');
+  /* Applicant profile */
+  const conf = p.income_confidence != null
+    ? ` <span class="dim">(conf: ${Math.round(p.income_confidence * 100)}%)</span>` : '';
+  const thin = p.thin_file == null ? '—'
+    : p.thin_file ? '<span class="badge warn">Yes</span>' : '<span class="badge ok">No</span>';
+  const pub  = (p.public_records || 0) > 0
+    ? `<span class="badge bad">${p.public_records}</span>` : `${p.public_records ?? 0}`;
+  document.getElementById('profileGrid').innerHTML =
+    kvRow('Annual Income',      fmtMoney(p.annual_income)) +
+    kvRow('Verified Income',    p.verified_income != null ? fmtMoney(p.verified_income) + conf : '—') +
+    kvRow('Loan Requested',     fmtMoney(p.loan_amount)) +
+    kvRow('Loan Purpose',       esc(p.loan_purpose || '—')) +
+    kvRow('Loan Term',          p.loan_term_months ? `${p.loan_term_months} months` : '—') +
+    kvRow('Employment',         `${p.months_employed ?? '—'} months · ${esc(p.employment_type || '—')}`) +
+    kvRow('Verification',       esc(p.verification_status || '—') + ' <span class="dim">(system)</span>') +
+    kvRow('Credit Score',       p.credit_score ?? '—') +
+    kvRow('Debt-to-Income',     fmtPct(p.dti_pct)) +
+    kvRow('Revolving Util.',    fmtPct(p.revolving_utilisation)) +
+    kvRow('Delinquencies 2yr',  p.delinquencies_2yr ?? '—') +
+    kvRow('Credit Age',         p.credit_age_months != null ? `${p.credit_age_months} months` : '—') +
+    kvRow('Open Accounts',      p.open_accounts ?? '—') +
+    kvRow('Thin-File Flag',     thin) +
+    kvRow('Public Records',     pub);
 
-  // Risk score
-  const rsEl = document.getElementById('riskScore');
-  const rbEl = document.getElementById('riskBand');
+  /* Risk model output */
   const band = data.risk_band || '—';
-  rsEl.textContent = (data.risk_score || 0).toFixed(4);
-  rsEl.style.color = band === 'Low' ? 'var(--green)' : band === 'High' ? 'var(--red)' : 'var(--amber)';
-  rbEl.textContent = band;
+  const bandBadge =
+    band === 'Low'    ? '<span class="badge ok">Low</span>' :
+    band === 'High'   ? '<span class="badge bad">High</span>' :
+    band === 'Medium' ? '<span class="badge warn">Medium</span>' : esc(band);
+  const flags = (data.policy_flags || []).length ? esc(data.policy_flags.join(', ')) : 'None';
+  const stops = (data.hard_stops || []).length
+    ? `<span class="badge bad">${esc(data.hard_stops.join(', '))}</span>` : 'None';
+  document.getElementById('riskGrid').innerHTML =
+    kvRow('Risk Score',      (data.risk_score ?? 0).toFixed(4)) +
+    kvRow('Risk Band',       bandBadge) +
+    kvRow('Model',           esc(data.model_version || '—')) +
+    kvRow('Policy Flags',    flags) +
+    kvRow('Hard Stops',      stops) +
+    kvRow('Pipeline Cost',   `$${(data.cost_usd_total ?? 0).toFixed(5)}`);
 
-  // SHAP
-  const shapDiv = document.getElementById('shapBars');
-  const feats   = data.top_features || [];
-  const maxVal  = Math.max(...feats.map(f => Math.abs(f.shap_value || 0)), 0.001);
-  shapDiv.innerHTML = feats.slice(0, 5).map(f => {
-    const pct   = (Math.abs(f.shap_value) / maxVal * 100).toFixed(1);
-    const color = f.direction === 'increases_risk' ? 'var(--red)' : 'var(--green)';
-    return `
-      <div class="shap-row">
-        <div class="shap-name" title="${f.feature}">${f.feature}</div>
-        <div class="shap-bar-bg"><div class="shap-bar" style="width:${pct}%;background:${color}"></div></div>
-        <div class="shap-val">${(f.shap_value||0).toFixed(3)}</div>
-      </div>`;
+  /* SHAP feature attribution */
+  const feats  = data.top_risk_features || [];
+  const maxAbs = Math.max(...feats.map(f => Math.abs(f.shap_value || 0)), 0.0001);
+  document.getElementById('shapBody').innerHTML = feats.slice(0, 5).map(f => {
+    const pct = (Math.abs(f.shap_value) / maxAbs * 100).toFixed(1);
+    const dir = f.direction === 'increases_risk' ? 'up' : 'down';
+    return `<tr>
+      <td title="${esc(f.feature)}">${esc(featureLabel(f.feature))}</td>
+      <td>${Number(f.value).toLocaleString('en-US', { maximumFractionDigits: 2 })}</td>
+      <td>${Number(f.shap_value).toFixed(4)}</td>
+      <td><div class="shap-bar-bg"><div class="shap-bar ${dir}" style="width:${pct}%"></div></div></td>
+    </tr>`;
+  }).join('') || '<tr><td colspan="4" style="color:var(--muted)">No attribution data available</td></tr>';
+
+  /* Decision reasons */
+  document.getElementById('reasonsList').innerHTML = (data.reasons || []).map((r, i) => {
+    const cited = esc(r).replace(/\[([^\]]+)\]/g, '<span class="cite">[$1]</span>');
+    return `<div class="reason"><span class="n">${i + 1}</span><span>${cited}</span></div>`;
   }).join('');
+
+  const conds = data.conditions || [];
+  const condBlock = document.getElementById('condBlock');
+  if (conds.length) {
+    condBlock.style.display = 'block';
+    document.getElementById('condList').innerHTML =
+      conds.map(c => `<div class="cond">${esc(c)}</div>`).join('');
+  } else {
+    condBlock.style.display = 'none';
+  }
+
+  /* Evaluation */
+  const faith = data.faithfulness_score ?? 0;
+  const relev = data.relevancy_score ?? 0;
+  const fb = document.getElementById('faithBar');
+  const rb = document.getElementById('relevBar');
+  fb.style.width = `${(faith * 100).toFixed(0)}%`;
+  rb.style.width = `${(relev * 100).toFixed(0)}%`;
+  fb.className = `eval-bar${faith < 0.75 ? ' low' : ''}`;
+  rb.className = `eval-bar${relev < 0.5 ? ' low' : ''}`;
+  document.getElementById('faithVal').textContent = faith.toFixed(3);
+  document.getElementById('relevVal').textContent = relev.toFixed(3);
+  document.getElementById('evalGrid').innerHTML =
+    kvRow('Gate Result', data.eval_pass
+      ? '<span class="badge ok">✓ PASS</span>' : '<span class="badge bad">✗ FAIL</span>') +
+    kvRow('Retries',     `${data.retry_count ?? 0}`) +
+    kvRow('Escalated',   data.escalated
+      ? '<span class="badge warn">Yes — human review</span>' : 'No') +
+    kvRow('Threshold',   '0.75');
+
+  /* Audit trace */
+  document.getElementById('traceBody').innerHTML = (data.trace || []).map((e, i) => `
+    <tr>
+      <td>${i + 1}</td>
+      <td class="agent-cell">${esc(e.agent)}</td>
+      <td>${esc(e.action)}${e.cost_usd ? ` <span style="color:var(--muted)">($${e.cost_usd.toFixed(5)})</span>` : ''}</td>
+      <td class="time-cell">${esc((e.timestamp || '').replace('T', ' ').slice(0, 23))}</td>
+    </tr>`).join('') ||
+    '<tr><td colspan="4" style="color:var(--muted)">Trace unavailable</td></tr>';
+
+  /* Footer */
+  document.getElementById('reportFooter').innerHTML =
+    `This decision record is immutable and retained for regulatory review.<br>` +
+    `audit_id: ${esc(data.audit_id)} · pipeline cost: $${(data.cost_usd_total ?? 0).toFixed(5)}`;
 }
 
+/* ─────────────────────────── Submit handler ──────────────────────────── */
 document.getElementById('appForm').addEventListener('submit', async (e) => {
   e.preventDefault();
 
-  const btn  = document.getElementById('submitBtn');
-  const txt  = document.getElementById('btnText');
-  const err  = document.getElementById('errBox');
+  const btn = document.getElementById('submitBtn');
+  const err = document.getElementById('errBox');
   err.style.display = 'none';
   btn.disabled = true;
-  txt.textContent = '⏳ Processing...';
 
-  document.getElementById('pipelineIdle').style.display = 'none';
-  document.getElementById('traceSteps').style.display   = 'flex';
-  document.getElementById('resultsCard').style.display  = 'none';
-  buildTrace();
+  const name = document.getElementById('name').value.trim();
 
+  /* NOTE: applicant_id and verification_status are intentionally omitted —
+     the system generates/determines them server-side. */
   const payload = {
-    applicant_id:          document.getElementById('applicant_id').value,
-    name:                  document.getElementById('name').value,
+    name:                  name,
     loan_amount:           +document.getElementById('loan_amount').value,
     loan_purpose:          document.getElementById('loan_purpose').value,
     loan_term_months:      +document.getElementById('loan_term_months').value,
     annual_income:         +document.getElementById('annual_income').value,
     employment_type:       document.getElementById('employment_type').value,
     months_employed:       +document.getElementById('months_employed').value,
-    verification_status:   document.getElementById('verification_status').value,
     existing_debts:        +document.getElementById('existing_debts').value,
     credit_score:          +document.getElementById('credit_score').value,
     delinquencies_2yr:     +document.getElementById('delinquencies_2yr').value,
@@ -595,14 +945,9 @@ document.getElementById('appForm').addEventListener('submit', async (e) => {
     home_ownership:        document.getElementById('home_ownership').value,
   };
 
-  // Animate steps sequentially while API call runs
-  const stepOrder = ['init','income','credit','policy','risk','synthesize','evaluate','record'];
-  const DELAYS    = [200, 800, 1200, 1800, 2600, 3200, 5500, 7000];
-
-  stepOrder.forEach((key, i) => {
-    setTimeout(() => setStep(key, 'active'), DELAYS[i]);
-    if (i > 0) setTimeout(() => setStep(stepOrder[i-1], 'done'), DELAYS[i]);
-  });
+  buildProcView(name);
+  showView('processing');
+  animateProc();
 
   try {
     const res  = await fetch(`${API}/applications`, {
@@ -613,22 +958,25 @@ document.getElementById('appForm').addEventListener('submit', async (e) => {
     const data = await res.json();
 
     if (!res.ok) {
-      throw new Error(data.detail || JSON.stringify(data));
+      const detail = typeof data.detail === 'string'
+        ? data.detail : JSON.stringify(data.detail || data);
+      throw new Error(detail);
     }
 
-    // Mark all steps done
-    stepOrder.forEach(k => setStep(k, 'done'));
-
-    // Show results
-    document.getElementById('resultsCard').style.display = 'block';
-    renderDecision(data);
-    txt.textContent = '⚡ Submit for Underwriting';
+    finishProc(data);
+    setTimeout(() => {
+      renderReport(data);
+      showView('report');
+    }, 900);
 
   } catch (ex) {
-    stepOrder.forEach(k => setStep(k, 'error'));
-    err.style.display = 'block';
-    err.textContent   = `Error: ${ex.message}. Make sure the API server is running: uvicorn api.main:app --reload --port 8000`;
-    txt.textContent   = '⚡ Submit for Underwriting';
+    failProc();
+    setTimeout(() => {
+      showView('form');
+      err.style.display = 'block';
+      err.textContent = `We couldn't process the application: ${ex.message}. ` +
+        `Please confirm the underwriting service is running (uvicorn api.main:app --port 8000) and try again.`;
+    }, 700);
   } finally {
     btn.disabled = false;
   }

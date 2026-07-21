@@ -76,10 +76,22 @@ def evaluate_node(state: ApplicationState) -> dict:
         rs  = state.get("risk_score")
 
         source_ctx = json.dumps({
+            "applicant":       {"loan_amount": af.loan_amount,
+                                "loan_purpose": af.loan_purpose,
+                                "loan_term_months": af.loan_term_months,
+                                "employment_type": af.employment_type,
+                                "months_employed": af.months_employed,
+                                "home_ownership": af.home_ownership,
+                                "annual_income": af.annual_income,
+                                "existing_monthly_debts": af.existing_debts,
+                                "dti_pct": round((af.existing_debts * 12) / max(af.annual_income, 1) * 100, 1),
+                                "loan_to_income": round(af.loan_amount / max(af.annual_income, 1), 2)},
             "income_verified": {"verified_income": inc.verified_income if inc else None,
                                 "confidence": inc.confidence if inc else None},
             "credit_report":   {"credit_score": cr.credit_score if cr else None,
                                 "delinquencies": cr.delinquencies if cr else None,
+                                "credit_age_months": cr.credit_age_months if cr else None,
+                                "open_accounts": cr.open_accounts if cr else None,
                                 "thin_file": cr.thin_file if cr else None,
                                 "utilization_pct": cr.utilization_pct if cr else None},
             "policy_findings": {"hard_stops": pf.hard_stops if pf else [],
