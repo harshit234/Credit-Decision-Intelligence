@@ -121,10 +121,7 @@ uvicorn api.main:app --reload --port 8000
 python -m http.server 3000 --directory ui
 ```
 
-### 5. Open the App
-Navigate to **[http://localhost:3000](http://localhost:3000)**
-
-### 6. Run Tests
+### 5. Run Tests
 ```bash
 # CI regression gate (deterministic, no LLM cost)
 python tests/run_regression.py
