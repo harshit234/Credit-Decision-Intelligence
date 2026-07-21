@@ -2,14 +2,27 @@
 dataset/lending_club/
 dataset/home-credit-default-risk/
 dataset/unified_training_data.csv
-# Allow EDA plots and sample dataset
-!dataset/eda_plots/
-!dataset/sample_unified_dataset.csv
+dataset/train_data.csv/
+dataset/train_labels.csv/
+*.parquet
 
-# ─── Model Artifacts (committed separately via Git LFS if needed) ───────────
+# Allow EDA plots and sample datasets
+!dataset/eda_plots/
+!dataset/amex_eda_plots/
+!dataset/sample_unified_dataset.csv
+!dataset/amex_sample_50rows.csv
+
+# ─── Model Artifacts ─────────────────────────────────────────────────────────
 models/*.pkl
-models/*.json
 models/*.bin
+# AmEx V1 model — historical showcase (PR-AUC 0.9378, not pipeline-compatible)
+!models/feature_schema_v1.json
+!models/lgbm_halcyon_v1.txt
+# LendingClub V2 model — production pipeline model (ROC-AUC 0.7166)
+!models/feature_schema_v2_lc.json
+!models/lgbm_halcyon_v2_lc.txt
+!models/train_lc_v2.py
+
 
 # ─── Python ─────────────────────────────────────────────────────────────────
 __pycache__/
