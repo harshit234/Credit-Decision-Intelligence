@@ -1,7 +1,7 @@
 # 🏦 Halcyon Credit — Agentic Underwriting Copilot
 
-> **Team Jamun** · Harshit · Ayush · Aditya · Himkar
-> Futurense AI Clinic · Capstone Project 02
+> **Team Jamun** · Harshit · Himkar · Aditya · Ayush
+> Futurense × IIT Gandhinagar · PG Diploma in AI-ML & Agentic AI Engineering · Cohort 1
 
 ---
 
@@ -9,9 +9,9 @@
 
 Halcyon Credit is a digital consumer lender offering personal loans — many to applicants with thin or non-traditional credit histories. Applications arrive faster than human underwriters can process them manually.
 
-Each application file contains structured data: income, existing debts, bureau records, prior applications, and a stated loan purpose. A human underwriter reads the file, cross-checks the numbers, weighs the risk, applies policy, and writes a decision with reasons. This work is careful, slow, and the queue keeps growing.
+A human underwriter reads the application file, cross-checks the numbers, weighs the risk, applies policy, and writes a decision with reasons. This work is careful, slow, and the queue keeps growing.
 
-**The core challenge:** Halcyon does not want a black-box score that simply outputs *approve* or *decline*. A lender must:
+**The core challenge:** Halcyon does not want a black-box score. A lender must:
 - Explain every decline to the applicant
 - Defend it to a regulator
 - Treat all applicants fairly
@@ -20,204 +20,251 @@ Each application file contains structured data: income, existing debts, bureau r
 
 ## 💡 Our Solution
 
-We are building an **Agentic Underwriting Copilot** — a multi-agent AI system that:
+An **Agentic Underwriting Copilot** — a multi-agent AI system that:
 
-1. **Assembles** the full applicant file from structured data sources
-2. **Verifies** income and credit history via specialized agents and tools
-3. **Assesses** repayment risk using a trained risk scoring model
-4. **Checks** every decision against lending policy and fairness requirements
-5. **Synthesizes** an evidence-backed recommendation
-6. **Evaluates** the decision for quality and faithfulness before output
-7. **Records** a fully auditable decision with written reasons
-
-The output is a recommendation a human underwriter can trust and a regulator could review — not a black box, but a traceable reasoning chain.
+1. **Verifies** income and pulls bureau credit data via specialized agents
+2. **Assesses** repayment risk using a trained LightGBM model (ROC-AUC 0.7166)
+3. **Checks** every decision against 7 institutional lending policies via ChromaDB
+4. **Synthesizes** an evidence-backed APPROVE / DECLINE / REFER recommendation using GPT-4.1
+5. **Evaluates** the decision for faithfulness before output (LLM-as-Judge, threshold 0.75)
+6. **Records** a fully auditable decision with written reasons and full pipeline trace
 
 ---
 
 ## 🏗️ System Architecture
 
-The system follows an **Orchestrator-Worker** pattern combined with an **Evaluator-Optimizer** layer, built using **LangGraph** for stateful multi-agent orchestration and **FastAPI** as the API gateway.
-
 ```
-Loan Application UI
-        ↓
-  API Gateway / FastAPI
-        ↓
-  Orchestrator Agent
-   ├──→ Income Verification Agent ──→ Income DB Tool
-   ├──→ Credit History Agent ──────→ Credit Bureau Tool
-   ├──→ Policy Complaint Agent ────→ Policy Retrieval Tool
-   ├──→ Risk Scoring Agent (receives from Credit History + Policy agents)
-   ├──→ Decision Synthesizer Agent
-   ├──→ Evaluation Agent
-   └──→ Decision Record Writer
-        ↓
-     Output
+Loan Application UI (http://localhost:3000)
+         ↓
+   FastAPI API Gateway (http://localhost:8000)
+         ↓
+   LangGraph Orchestrator (8-node StateGraph)
+    ├──[parallel]──► Income Verification Agent  →  Income DB Tool
+    ├──[parallel]──► Credit Bureau Agent        →  Credit Bureau Tool
+    └──[parallel]──► Policy Compliance Agent    →  ChromaDB (7 policies)
+                          ↓
+                    Risk Scoring Agent           →  LightGBM (41 features)
+                          ↓
+                    Decision Synthesizer         →  GPT-4.1 via OpenRouter
+                          ↓
+                    Evaluation Agent             →  GPT-4.1 (LLM-as-Judge)
+                       ┌──┴──┐
+                  [PASS]    [RETRY → max 2]
+                       ↓
+                  Record Writer                 →  SQLite Audit Trail
 ```
-
-### Agent Responsibilities
-
-| Agent | Responsibility | Tool Used |
-|---|---|---|
-| Orchestrator Agent | Coordinates the full pipeline, manages state | — |
-| Income Verification Agent | Verifies applicant income from DB | Income DB Tool |
-| Credit History Agent | Fetches bureau records and credit data | Credit Bureau Tool |
-| Policy Complaint Agent | Retrieves and checks relevant lending policies | Policy Retrieval Tool |
-| Risk Scoring Agent | Computes repayment risk score using ML model | — |
-| Decision Synthesizer Agent | Combines all signals into a recommendation | — |
-| Evaluation Agent | Judges decision quality and explanation faithfulness | — |
-| Decision Record Writer | Writes the final auditable decision record | — |
 
 ---
 
 ## 🛠️ Tech Stack
 
 | Layer | Technology |
-|---|---|
+|-------|-----------|
 | Agent Orchestration | LangGraph |
-| LLM Gateway | LiteLLM |
-| API Layer | FastAPI |
-| Vector Store / RAG | ChromaDB |
-| LLM Models | Gemini Flash (dev), stronger model (eval) |
-| Risk Model | XGBoost / LightGBM (trained on real data) |
-| Evaluation | RAGAS, DSPy, LLM-as-Judge |
-| Deployment | Free cloud tier (TBD) |
-| CI/CD | GitHub Actions |
-
----
-
-## 📋 Sprint Plan
-
-### Sprint 0 — Discover & Define
-**Goal:** Understand the problem, profile the data, write PRD v1
-
-- Dataset selection and profiling (TBD)
-- Exploratory Data Analysis (EDA)
-- Dataset card: source, license, schema, class balance, gaps
-- 3–5 user personas (underwriter, applicant, ops lead, compliance officer, regulator)
-- PRD v1: problem, scope, metrics with baselines
-- Risk Register v1: bias/fairness, unexplainable decline, hallucinated facts, data exposure, over-automation
-- Evaluation plan
-
-**Exit criteria:** Profiled data, personas, PRD v1 with metrics and baselines, Risk Register v1
-
----
-
-### Sprint 1 — Design & De-risk
-**Goal:** Finalize architecture, write the build-ready spec, spike riskiest assumption
-
-- Finalize system architecture diagram
-- Orchestration Decision Record: justify LangGraph orchestrator-worker + evaluator-optimizer pattern
-- Agent contracts as JSON schemas (input/output per agent)
-- LLM Gateway design (LiteLLM): routing policy, fallback chain, rate limits, retries
-- Model routing table: cheap model path vs. strong model path
-- Tool specifications: Income DB, Credit Bureau, Policy Retrieval, Decision Record Writer
-- Agent Registry design
-- Memory & state design
-- Synthetic data pipeline v1: applicant narratives, thin-file profiles, adversarial cases, fraud patterns
-- Evaluation harness and golden set
-- Spike: validate Policy Retrieval Tool faithfully grounds decisions
-
-**Exit criteria:** Architecture spec, agent contracts, synthetic pipeline v1, golden set, spike done
-
----
-
-### Sprint 2 — Build the Core
-**Goal:** End-to-end agent pipeline working, gateway live, first cost baseline
-
-- Project structure setup: `agents/`, `tools/`, `gateway/`, `api/`, `ui/`, `eval/`, `data/`
-- FastAPI entry point + minimal Loan Application UI
-- Orchestrator Agent (LangGraph)
-- Income Verification Agent + Income DB Tool (mock)
-- Credit History Agent + Credit Bureau Tool (mock)
-- Policy Complaint Agent + Policy Retrieval Tool (ChromaDB + RAG)
-- Risk Scoring Agent (XGBoost/LightGBM trained on dataset)
-- Decision Synthesizer Agent
-- LiteLLM gateway with routing live
-- First end-to-end test: one application through full pipeline
-- Cost baseline: tokens and cost per application
-
-**Exit criteria:** Core agent path working end-to-end, gateway live, cost baseline recorded
-
----
-
-### Sprint 3 — Harden, Scale & Optimize
-**Goal:** Full agent set, concurrency, evaluation pipeline, DSPy optimization
-
-- Evaluation Agent (LLM-as-judge with written rubric)
-- Decision Record Writer (structured JSON/DB output)
-- Async FastAPI + concurrency support
-- Semantic caching for repeated policy lookups
-- RAGAS evaluation: faithfulness, answer relevancy, context precision/recall
-- DSPy: optimize prompts for Risk Scoring + Decision Synthesizer — before/after comparison
-- A/B comparison: routing policies and prompt variants
-- Fairness testing: approval/error rate gaps across applicant segments
-- Adversarial/red-team pass: inconsistent applications, misleading statements
-- Risk Register updated
-- Regression suite: golden set gates every merge
-
-**Exit criteria:** Full agent set, RAGAS scores, DSPy results, A/B winners, regression suite live
-
----
-
-### Sprint 4 — Verify, Operate & Present
-**Goal:** Final benchmark, deployment, runbook, 20-minute video, viva
-
-- End-to-end benchmark: agentic system vs. single-LLM baseline (report all deltas honestly)
-- Final evaluation report: RAGAS, calibrated judge, DSPy results, A/B outcomes, safety pass, gap analysis vs PRD
-- Deployment on free cloud tier
-- Operate Runbook: monitoring, human-fallback path, rollback, cost alarms, incident response
-- SLOs: latency, availability, cost ceiling + alerts
-- Final repo cleanup: tests, CI check, no secrets committed
-- Synthetic data card + augmentation benchmark table
-- 20-minute recorded presentation
-- Viva preparation
-
-**Exit criteria:** Deployed system, runbook, final evaluation report, video submitted, viva ready
+| LLM Gateway | Direct HTTP → OpenRouter (GPT-4.1) |
+| API Layer | FastAPI (v1 + v2 endpoints) |
+| Vector Store / RAG | ChromaDB + all-MiniLM-L6-v2 |
+| LLM Models | GPT-4.1 (synthesis + evaluation) |
+| Risk Model | LightGBM (trained on 1.3M LendingClub rows) |
+| Evaluation | LLM-as-Judge + RAGAS + Deterministic regression gate |
+| Frontend | Vanilla HTML/JS/CSS (3-stage SPA) |
+| Database | SQLite (audit trail) |
 
 ---
 
 ## 📊 Key Metrics
 
-| Metric | What It Measures |
-|---|---|
-| Decision Quality | Agreement with ground-truth outcome on held-out loans |
-| Explanation Faithfulness | Whether written reasons match actual decision factors |
-| Fairness Gap | Approval/error rate difference across applicant segments |
-| Policy Adherence | Whether every decision respects stated lending policy |
-| Cost per Application | Unit economics — the guardrail that decides if this ships |
+| Metric | Value |
+|--------|-------|
+| Decision Accuracy (golden set) | **100%** (10/10) |
+| LLM Faithfulness | **1.000** |
+| LLM Relevancy | **1.000** |
+| Cost per Application | **~$0.005** |
+| End-to-End Latency | **~12 seconds** |
+| ML Model ROC-AUC | **0.7166** |
+| ML Model PR-AUC | **0.3854** |
+| Training Rows | **1,302,850** |
+| Model Features | **41** |
+| Policy Rules | **7** |
+| Integration Tests | **13 / 13 pass** |
+| Adversarial Tests | **8 / 8 pass** |
+| CI Regression Gate | **10 / 10 pass** |
 
 ---
 
-## 📁 Repository Structure *(planned)*
+## 🚀 Quick Start
+
+### Prerequisites
+- Python 3.10+
+- OpenRouter API key (get one at [openrouter.ai](https://openrouter.ai))
+
+### 1. Clone & Install
+```bash
+git clone https://github.com/harshit234/Credit-Decision-Intelligence.git
+cd Credit-Decision-Intelligence
+pip install -r requirements_stage3.txt
+```
+
+### 2. Configure Environment
+```bash
+cp .env.example .env
+# Edit .env and add your OPENROUTER_API_KEY
+```
+
+### 3. Run Backend API
+```bash
+uvicorn api.main:app --reload --port 8000
+```
+
+### 4. Run Frontend Dashboard
+```bash
+python -m http.server 3000 --directory ui
+```
+
+### 5. Open the App
+Navigate to **[http://localhost:3000](http://localhost:3000)**
+
+### 6. Run Tests
+```bash
+# CI regression gate (deterministic, no LLM cost)
+python tests/run_regression.py
+
+# Full integration tests
+python tests/integration/test_pipeline_integration.py
+
+# Adversarial / red-team tests
+python tests/adversarial/test_adversarial.py
+
+# Full RAGAS golden set eval (uses API key)
+python eval/ragas_runner.py
+
+# Fairness segment analysis
+python eval/fairness_test.py
+```
+
+---
+
+## 📁 Repository Structure
 
 ```
-halcyon-underwriting-copilot/
-├── agents/               # LangGraph agent definitions
-├── tools/                # Income DB, Credit Bureau, Policy Retrieval, Record Writer
-├── gateway/              # LiteLLM gateway + routing policy
-├── api/                  # FastAPI endpoints
-├── ui/                   # Minimal loan application UI
-├── eval/                 # RAGAS, DSPy, golden set, regression suite
-├── data/                 # Dataset cards, synthetic data, EDA notebooks
-├── docs/                 # PRD, architecture spec, risk register, runbook
-├── tests/                # Unit + integration tests
-├── Agentic_Architecture.png
-└── README.md
+Credit-Decision-Intelligence/
+├── agents/                        # 7 LangGraph agent nodes
+│   ├── income_agent.py            # Income verification
+│   ├── credit_agent.py            # Credit bureau pull
+│   ├── policy_agent.py            # Policy compliance (deterministic + RAG)
+│   ├── risk_agent.py              # LightGBM risk scoring
+│   ├── synthesizer_agent.py       # GPT-4.1 decision synthesis
+│   ├── evaluation_agent.py        # LLM-as-Judge faithfulness gate
+│   └── record_writer.py           # SQLite audit writer
+├── api/
+│   ├── main.py                    # FastAPI entry point
+│   ├── routes.py                  # v1 endpoints
+│   ├── routes_v2.py               # v2 endpoints (metrics, health, records)
+│   └── schemas.py                 # Pydantic input/output schemas
+├── data/                          # EDA and ML feasibility scripts
+├── docs/
+│   └── RUNBOOK.md                 # Operational runbook (SLOs, incidents, rollback)
+├── eval/
+│   ├── golden_set/test_cases.json # 10 curated golden test cases
+│   ├── ragas_runner.py            # Full RAGAS evaluation runner
+│   ├── fairness_test.py           # 4-cohort fairness disparity analysis
+│   ├── dspy_optimizer.py          # Prompt optimization before/after comparison
+│   └── final_evaluation_report.md # Sprint 3 full evaluation report
+├── gateway/
+│   ├── router.py                  # Direct OpenRouter HTTP gateway
+│   └── prompts.py                 # Centralised LLM prompt library (v2)
+├── graph/
+│   └── pipeline.py                # LangGraph StateGraph (8 nodes)
+├── models/
+│   └── lgbm_halcyon_v2_lc.txt    # Production LightGBM model
+├── state/
+│   └── application_state.py       # ApplicationState TypedDict + all Pydantic models
+├── tests/
+│   ├── integration/               # 13 deterministic integration tests (Aditya)
+│   └── adversarial/               # 8 red-team tests (Aditya)
+├── tools/
+│   ├── income_db_tool.py          # Mock income bureau
+│   ├── credit_bureau_tool.py      # Mock credit bureau
+│   ├── policy_retrieval_tool.py   # ChromaDB semantic search wrapper
+│   ├── credit_score_bridge.py     # FICO → 41-feature vector bridge (Harshit)
+│   └── decision_record_tool.py    # SQLite persistence
+├── ui/
+│   └── index.html                 # Full-stack SPA dashboard (Ayush)
+├── .env.example                   # Environment config template
+├── run_live_test.py               # End-to-end smoke test
+├── PRD.md                         # Product Requirements Document
+├── TRD.md                         # Technical Requirements Document
+├── dataset_card.md                # LendingClub dataset documentation
+└── Project_Report.md              # Comprehensive project report
 ```
+
+---
+
+## 🔌 API Reference
+
+### POST `/applications`
+Submit a loan application for underwriting.
+
+**Request body** (all fields required except `applicant_id`):
+```json
+{
+  "name": "Rohan Mehta",
+  "loan_amount": 250000,
+  "loan_purpose": "home_improvement",
+  "loan_term_months": 36,
+  "annual_income": 900000,
+  "employment_type": "salaried",
+  "months_employed": 48,
+  "existing_debts": 5000,
+  "credit_score": 720,
+  "delinquencies_2yr": 0,
+  "open_accounts": 8,
+  "revolving_utilisation": 22.0,
+  "credit_age_months": 84,
+  "public_records": 0,
+  "inquiries_6mo": 1,
+  "home_ownership": "MORTGAGE"
+}
+```
+
+**Response:**
+```json
+{
+  "audit_id": "uuid",
+  "recommendation": "APPROVE",
+  "reasons": ["Credit score of 720 [credit_report.credit_score=720] is strong..."],
+  "risk_score": 0.1821,
+  "risk_band": "Low",
+  "faithfulness_score": 1.0,
+  "relevancy_score": 1.0,
+  "eval_pass": true,
+  "cost_usd_total": 0.00464,
+  "top_risk_features": [...],
+  "applicant": {...},
+  "trace": [...]
+}
+```
+
+### Other Endpoints
+| Endpoint | Description |
+|----------|-------------|
+| `GET /health` | Basic health check |
+| `GET /v2/health/detailed` | Subsystem health (DB, Model, ChromaDB, API key) |
+| `GET /v2/model/info` | LightGBM version and performance metrics |
+| `GET /v2/metrics/operational` | Aggregated dashboard KPIs |
+| `GET /v2/records/{audit_id}` | Retrieve full decision record |
+| `GET /v2/records` | List recent decisions (paginated) |
 
 ---
 
 ## 👥 Team Jamun
 
-| Name | Role |
-|---|---|
-| Harshit | AI/GenAI Engineer |
-| Ayush | AI/GenAI Engineer |
-| Aditya | AI/GenAI Engineer |
-| Himkar | AI/GenAI Engineer |
-
-**Program:** Futurense × IIT Gandhinagar · PG Diploma in AI-ML & Agentic AI Engineering · Cohort 1
+| Name | Domain |
+|------|--------|
+| **Harshit Gautam** | ML Model Training, Risk Scoring, API Integration |
+| **Himkar Vashistha** | Policy KB, Prompt Engineering, LLM Gateway, Documentation |
+| **Aditya Arora** | State Schema, Data Pipelines, Integration & Adversarial Testing |
+| **Ayush Kumar** | LLM Agents, Evaluation, UI Dashboard |
 
 ---
 
@@ -227,4 +274,4 @@ This project is built for academic and portfolio purposes as part of the Futuren
 
 ---
 
-*Halcyon Credit is a fictional persona created for this engagement.*
+*Halcyon Credit is a fictional lender created for this capstone engagement.*
