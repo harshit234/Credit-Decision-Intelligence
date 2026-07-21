@@ -64,7 +64,9 @@ def run_golden_set_eval(verbose: bool = True) -> dict:
             )
             correct      = actual_rec == expected
             faithfulness = ev.faithfulness if ev else None
+            relevancy    = ev.relevancy    if ev else None
             risk_score   = risk.risk_score if risk else None
+            cost_usd     = record.cost_usd_total if record else None
             elapsed      = time.time() - t0
 
             result = {
@@ -74,7 +76,9 @@ def run_golden_set_eval(verbose: bool = True) -> dict:
                 "actual":        actual_rec,
                 "correct":       correct,
                 "faithfulness":  round(faithfulness, 3) if faithfulness is not None else None,
-                "risk_score":    round(risk_score, 4) if risk_score is not None else None,
+                "relevancy":     round(relevancy,    3) if relevancy    is not None else None,
+                "risk_score":    round(risk_score, 4)   if risk_score   is not None else None,
+                "cost_usd":      round(cost_usd, 5)     if cost_usd     is not None else None,
                 "elapsed_s":     round(elapsed, 1),
                 "reasons":       decision.reasons if decision else [],
                 "hard_stops":    final_state.get("policy_findings").hard_stops
@@ -86,7 +90,8 @@ def run_golden_set_eval(verbose: bool = True) -> dict:
 
             status = "PASS" if correct else "FAIL"
             print(f"    Expected: {expected:8s} | Actual: {actual_rec:8s} | "
-                  f"[{status}] | Faith={faithfulness:.3f if faithfulness else 'N/A'} "
+                  f"[{status}] | Faith={faithfulness:.3f if faithfulness else 'N/A':>5} "
+                  f"Relev={relevancy:.3f if relevancy else 'N/A':>5} "
                   f"| Risk={risk_score:.4f if risk_score else 'N/A'} | {elapsed:.1f}s")
 
         except Exception as e:
@@ -107,7 +112,11 @@ def run_golden_set_eval(verbose: bool = True) -> dict:
     accuracy  = correct / total
 
     faith_vals = [r["faithfulness"] for r in results if r["faithfulness"] is not None]
+    relev_vals = [r["relevancy"]    for r in results if r.get("relevancy") is not None]
+    cost_vals  = [r["cost_usd"]     for r in results if r.get("cost_usd")  is not None]
     avg_faith  = sum(faith_vals) / len(faith_vals) if faith_vals else 0.0
+    avg_relev  = sum(relev_vals) / len(relev_vals) if relev_vals else 0.0
+    total_cost = sum(cost_vals)
 
     approve_n = sum(1 for r in results if r["actual"] == "APPROVE")
     decline_n = sum(1 for r in results if r["actual"] == "DECLINE")
@@ -116,12 +125,15 @@ def run_golden_set_eval(verbose: bool = True) -> dict:
     print("\n" + "=" * 70)
     print("  EVALUATION SUMMARY")
     print("=" * 70)
-    print(f"  Total cases      : {total}")
-    print(f"  Correct          : {correct} / {total} ({accuracy:.0%})")
-    print(f"  Avg faithfulness : {avg_faith:.3f}")
+    print(f"  Total cases          : {total}")
+    print(f"  Correct              : {correct} / {total} ({accuracy:.0%})")
+    print(f"  Avg faithfulness     : {avg_faith:.3f}")
+    print(f"  Avg relevancy        : {avg_relev:.3f}")
+    print(f"  Total LLM cost       : ${total_cost:.4f}")
+    print(f"  Cost per application : ${total_cost/total:.5f}")
     print(f"  APPROVE / DECLINE / REFER : {approve_n} / {decline_n} / {refer_n}")
-    print(f"  Target accuracy  : >= 85%  →  {'PASS' if accuracy >= 0.85 else 'FAIL'}")
-    print(f"  Target faith     : >= 0.80 →  {'PASS' if avg_faith >= 0.80 else 'FAIL'}")
+    print(f"  Target accuracy  : >= 85%  ->  {'PASS' if accuracy >= 0.85 else 'FAIL'}")
+    print(f"  Target faith     : >= 0.80 ->  {'PASS' if avg_faith >= 0.80 else 'FAIL'}")
     print("=" * 70)
 
     # Per-case failure report
@@ -140,10 +152,13 @@ def run_golden_set_eval(verbose: bool = True) -> dict:
         "correct":          correct,
         "accuracy":         round(accuracy, 4),
         "avg_faithfulness": round(avg_faith, 4),
+        "avg_relevancy":    round(avg_relev, 4),
+        "total_cost_usd":   round(total_cost, 4),
+        "cost_per_app":     round(total_cost / total, 5),
         "approve_count":    approve_n,
         "decline_count":    decline_n,
         "refer_count":      refer_n,
-        "accuracy_pass":    accuracy >= 0.85,
+        "accuracy_pass":    accuracy  >= 0.85,
         "faith_pass":       avg_faith >= 0.80,
         "results":          results,
     }
